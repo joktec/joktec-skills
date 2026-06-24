@@ -22,6 +22,7 @@ Use this skill for third-party integration packages.
 - Use package services instead of direct SDK initialization in app code.
 - Preserve app-neutral service behavior; consumer apps own domain workflows.
 - Verify current package README/source before relying on advanced provider features.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## Reference
 

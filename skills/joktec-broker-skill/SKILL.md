@@ -24,6 +24,7 @@ Use this skill for message broker packages.
 - Use broker decorators for transport wiring, not for domain policy.
 - Preserve config-driven client selection and `conId` when available.
 - Keep topic, queue, and routing names explicit in app configuration or decorators.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## Reference
 

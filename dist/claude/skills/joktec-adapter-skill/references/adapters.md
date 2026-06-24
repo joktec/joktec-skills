@@ -1,8 +1,20 @@
 # Adapter Usage
 
+## Source Lookup
+
+When blocked, inspect:
+
+- `packages/adapters/README.md`
+- `packages/adapters/AGENTS.md`
+- `packages/adapters/<package>/README.md`
+- `packages/adapters/<package>/src/index.ts`
+- package module/config/service files under `src/`
+
 ## Runtime Pattern
 
 Adapters are global Nest modules. Services own native client creation and expose package-specific operations.
+
+Most adapters follow `AbstractClientService`: config is validated, native clients are created by the service, `conId` selects the connection, and shutdown/retry/debug behavior should remain package-owned.
 
 ## Package Notes
 
@@ -10,3 +22,19 @@ Adapters are global Nest modules. Services own native client creation and expose
 - Mailer: centralize mail transport configuration in the service that owns outbound email.
 - Notifier: keep push provider configuration outside app business logic.
 - Storage: keep storage metadata and object operations behind the adapter service.
+
+## Best Practices
+
+- Import adapter modules in the application layer, then inject services into domain services.
+- Keep provider credentials, endpoints, bucket names, SMTP secrets, and push credentials in runtime config.
+- Keep business payload composition in the consuming app. The adapter should send/cache/store, not decide product semantics.
+- Use `conId` for multiple providers or tenants instead of creating ad-hoc service instances.
+- Normalize provider errors at the package/app boundary so controllers do not branch on SDK-specific messages.
+- Mock SDK clients in unit tests; run live provider checks only in explicit integration or consumer harness tests.
+
+## Anti-Patterns
+
+- Do not put email template business rules inside `@joktec/mailer`.
+- Do not hardcode S3 buckets, Redis URLs, SMTP credentials, or notification tokens in source.
+- Do not bypass adapter services by importing provider SDK clients directly throughout the app.
+- Do not assume every adapter has identical method names; read each package README/source before calling.

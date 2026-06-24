@@ -24,6 +24,7 @@ Use this skill for shared framework primitives, low-level helpers, cron utilitie
 - Use page, offset, or cursor pagination contracts from core; let database packages execute storage-specific pagination.
 - Use `AbstractClientService` patterns for client packages that need config, lifecycle, retry, and `conId`.
 - Use `@joktec/utils` for shared helpers instead of duplicating conversion, validation, hashing, or UUID logic.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## References
 

@@ -25,6 +25,7 @@ Start here when a task mentions JokTec generally, multiple `@joktec/*` packages,
 - Prefer config-driven module setup and `conId` when a package supports multiple clients.
 - Preserve NestJS module boundaries, dependency injection, lifecycle hooks, and exported package APIs.
 - Do not invent behavior for unfinished or missing packages.
+- If a focused skill is loaded without this entrypoint, still apply source-first lookup before assuming APIs.
 
 ## Reference
 

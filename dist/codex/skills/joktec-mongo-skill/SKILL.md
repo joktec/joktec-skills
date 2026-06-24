@@ -19,6 +19,7 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Preserve `conId` when the app has multiple Mongo connections.
 - Use schema-first decorators when a schema class should be reused as a DTO source.
 - Treat ObjectId casting and regex behavior as safety-sensitive.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## References
 

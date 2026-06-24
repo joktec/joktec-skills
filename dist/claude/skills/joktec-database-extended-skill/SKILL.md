@@ -23,6 +23,7 @@ Use this skill for database clients that are not Mongo or MySQL.
 - Use package services for client lifecycle and connection config.
 - Do not claim parity with Mongo/MySQL repository behavior unless the package implements it.
 - Use package README and source as final truth before adding advanced behavior.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## Reference
 

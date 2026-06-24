@@ -24,6 +24,7 @@ Use this skill for pluggable external capability adapters.
 - Use validated config and `conId` where supported.
 - Keep secrets and credentials in app config or runtime environment, never in code.
 - Prefer adapter services over direct SDK usage in app services.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## Reference
 

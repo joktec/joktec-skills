@@ -12,6 +12,7 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Preserve `conId` when the app has multiple Mongo connections.
 - Use schema-first decorators when a schema class should be reused as a DTO source.
 - Treat ObjectId casting and regex behavior as safety-sensitive.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## References
 
@@ -24,13 +25,42 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 
 # Mongo Repository Usage
 
+## Source Lookup
+
+When blocked, inspect:
+
+- `packages/databases/mongo/README.md`
+- `packages/databases/mongo/AGENTS.md`
+- `packages/databases/mongo/src/index.ts`
+- `packages/databases/mongo/src/mongo.module.ts`
+- `packages/databases/mongo/src/mongo.service.ts`
+- `packages/databases/mongo/src/mongo.repo.ts`
+- `packages/databases/mongo/src/helpers/mongo.helper.ts`
+- `packages/databases/mongo/src/helpers/mongo.pipeline.ts`
+- `packages/databases/mongo/src/helpers/mongo.utils.ts`
+- `packages/databases/mongo/src/models/*`
+
 ## Module Setup
 
 Register schemas with `MongoModule.forRoot({ conId, models: [...] })`. Use the same `conId` in app repositories when using non-default connections.
 
+Best practice:
+
+- Register app schema classes in the consumer app repository module.
+- Use one owner process for index creation in multi-process deployments.
+- Preserve `conId` through service/repo constructors for multi-connection apps.
+- Do not rely on the global mongoose model registry when `MongoService` provides connection-aware resolution.
+
 ## Repository Pattern
 
 Extend `MongoRepo` and pass the schema class to the base constructor. Services can then use `BaseService` from `@joktec/core`.
+
+Repository checklist:
+
+- Keep schema-specific query helpers in the app repository, not in controllers.
+- Use repository methods for standard reads so query parsing, soft delete, populate, and pagination stay consistent.
+- Pass transaction/session options through read-modify-write flows when the app uses transactions.
+- Normalize returned documents through repository/service response paths so ObjectId values do not leak unexpectedly into DTOs.
 
 ## Query Safety
 
@@ -39,13 +69,39 @@ Extend `MongoRepo` and pass the schema class to the base constructor. Services c
 - `$like`, `$begin`, and `$end` escape regex input by default.
 - Do not rely on broad conversion when storing raw snapshots, maps, or nested subdocuments.
 
+Anti-patterns:
+
+- Do not convert every nested `id` key into `_id`; only API-facing query aliases should be converted.
+- Do not cast every 24-character hex string into ObjectId; fields like `externalId`, `code`, and `slug` may be strings.
+- Do not inject soft-delete conditions into unknown nested aggregate branches unless the target collection is known.
+
 ## Pagination
 
 `MongoRepo.paginate` supports page, offset, and cursor responses. Cursor mode defaults to `_id`; custom `cursorKey` appends `_id` as a tie-breaker.
 
+Cursor checklist:
+
+- Use `_id` for default Mongo cursor ordering.
+- Use `createdAt` or another indexed stable key when the product requires chronological cursor behavior.
+- Append `_id` as a tie-breaker for non-unique cursor keys.
+- Fetch `limit + 1` records and generate `nextCursor` only when another page exists.
+- Treat cursor tokens as opaque; clients should not parse them.
+
 ### references/schema-and-plugins.md
 
 # Mongo Schema And Plugins
+
+## Source Lookup
+
+When blocked, inspect:
+
+- `packages/databases/mongo/src/decorators/scheme.decorator.ts`
+- `packages/databases/mongo/src/decorators/prop.decorator.ts`
+- `packages/databases/mongo/src/decorators/props/*`
+- `packages/databases/mongo/src/models/mongo.schema.ts`
+- `packages/databases/mongo/src/plugins/paranoid.plugin.ts`
+- `packages/databases/mongo/src/plugins/strict-reference.plugin.ts`
+- `packages/databases/mongo/src/plugins/transform.plugin.ts`
 
 ## Schema Decorators
 
@@ -53,12 +109,29 @@ Use `@Schema` and `@Prop` wrappers from `@joktec/mongo` for Typegoose schema met
 
 Avoid mutating shared option objects across multiple properties.
 
+Best practice:
+
+- Use schema-first decorators when the schema should be reused by DTO mapped types.
+- Keep raw `@prop` or raw Mongoose decorators only when the wrapper cannot express the behavior.
+- Pass custom validators/transforms explicitly rather than adding hidden global behavior.
+- Keep maps, snapshots, and dynamic objects explicit so helper conversion does not alter their shape.
+- Keep app-level reference semantics visible; strict reference plugin checks existence, but the app still owns domain rules.
+
 ## Plugins
 
 - Paranoid plugin handles soft delete filtering and must respect aggregate first-stage constraints such as `$geoNear`.
 - Strict reference plugin validates referenced documents and must resolve models through the active connection.
 - Transform plugin centralizes common document transformation and should not break Mongo update operators.
 
+Plugin checklist:
+
+- Paranoid aggregate injection must not come before `$geoNear`.
+- Strict reference checks must be connection-aware in multi-connection apps.
+- Transform behavior must preserve update operators such as `$set`, `$inc`, `$push`, and `$addToSet`.
+- Do not treat plugins as a replacement for app authorization or domain validation.
+
 ## Debug Output
 
 Use `mongoDebug(collection, method, ...args)` when a Mongoose debug callback should be rendered as a Mongo shell-friendly command.
+
+Debug output is for developer diagnostics. Do not log credentials or sensitive document payloads in production logs.

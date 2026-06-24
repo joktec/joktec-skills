@@ -23,6 +23,7 @@ Use this skill for reusable utility services.
 - Use config-driven clients instead of direct ad hoc setup in app code.
 - Preserve retry, metrics, proxy, and upload behavior where the package exposes it.
 - Keep alert tokens and webhook URLs in runtime config only.
+- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
 
 ## Reference
 
