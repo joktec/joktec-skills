@@ -1,6 +1,10 @@
 ---
 name: joktec-tool-skill
 description: Use when wiring or using JokTec tool packages @joktec/http, @joktec/file, or @joktec/alert, including Axios-backed HTTP clients, file classification helpers, Slack-compatible alert webhooks, config-driven lifecycle, and app-neutral utility services.
+metadata:
+  dependencies:
+    - joktec-framework-skill
+    - joktec-common-skill
 ---
 
 # JokTec Tool Skill

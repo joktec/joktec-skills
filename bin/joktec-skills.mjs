@@ -5,7 +5,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import readlinePromises from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-import { DIST_DIR, ROOT, ensureDir, loadSkills, readJson, writeFile } from '../scripts/lib.mjs';
+import { DIST_DIR, ROOT, ensureDir, loadSkills, readJson } from '../scripts/lib.mjs';
 
 const AGENTS = ['codex', 'claude', 'cursor', 'gemini', 'copilot', 'windsurf'];
 const DEFAULT_SOURCE = 'https://github.com/joktec/joktec-skills.git';
@@ -268,22 +268,6 @@ function executeOperations(operations, force, dryRun) {
   }
 }
 
-function writeManifest(project, pack, agents, skillIds, dryRun) {
-  const file = path.join(project, '.joktec-skills.json');
-  const existing = fs.existsSync(file) ? readJson(file) : {};
-  const manifest = {
-    package: '@joktec/skills',
-    version: pack.version,
-    installedAt: new Date().toISOString(),
-    agents: Array.from(new Set([...(existing.agents || []), ...agents])).sort(),
-    skills: Array.from(new Set([...(existing.skills || []), ...skillIds])).sort(),
-    frameworkBaseline: pack.frameworkBaseline,
-    packageBaseline: pack.packageBaseline,
-  };
-  if (!dryRun) writeFile(file, JSON.stringify(manifest, null, 2));
-  return manifest;
-}
-
 function logo() {
   console.log(color.dim(`     ██╗ ██████╗ ██╗  ██╗████████╗███████╗ ██████╗
      ██║██╔═══██╗██║ ██╔╝╚══██╔══╝██╔════╝██╔════╝
@@ -346,15 +330,26 @@ function buildInstalledLines(project, operations, skillIds, dryRun) {
   ]);
 }
 
+function stripAnsi(value) {
+  return String(value).replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '');
+}
+
+function fitLine(value) {
+  const width = Math.max(40, (output.columns || 100) - 4);
+  const plain = stripAnsi(value);
+  if (plain.length <= width) return value;
+  return `${plain.slice(0, width - 1)}…`;
+}
+
 function renderMultiSelect(items, cursor, selected, message) {
-  readline.cursorTo(output, 0);
-  readline.clearScreenDown(output);
-  console.log(`${color.green('◇')}  ${message} ${color.dim('(space to toggle, enter to confirm)')}`);
+  const lines = [`${color.green('◇')}  ${message} ${color.dim('(space to toggle, enter to confirm)')}`];
   for (let i = 0; i < items.length; i += 1) {
     const marker = selected.has(items[i].value) ? color.green('●') : '○';
     const pointer = i === cursor ? color.cyan('›') : ' ';
-    console.log(`│ ${pointer} ${marker} ${items[i].label}`);
+    lines.push(`│ ${pointer} ${marker} ${fitLine(items[i].label)}`);
   }
+  output.write(`${lines.join('\n')}\n`);
+  return lines.length;
 }
 
 async function multiSelect(items, defaults, message) {
@@ -362,12 +357,22 @@ async function multiSelect(items, defaults, message) {
 
   const selected = new Set(defaults);
   let cursor = 0;
+  let renderedLines = 0;
   output.write('\n');
   readline.emitKeypressEvents(input);
   input.setRawMode(true);
 
   try {
     return await new Promise(resolve => {
+      const redraw = () => {
+        if (renderedLines) {
+          readline.moveCursor(output, 0, -renderedLines);
+          readline.cursorTo(output, 0);
+          readline.clearScreenDown(output);
+        }
+        renderedLines = renderMultiSelect(items, cursor, selected, message);
+      };
+
       const onKey = (str, key) => {
         if (key.name === 'c' && key.ctrl) {
           input.setRawMode(false);
@@ -383,15 +388,16 @@ async function multiSelect(items, defaults, message) {
         if (key.name === 'return') {
           input.off('keypress', onKey);
           input.setRawMode(false);
+          if (renderedLines) readline.moveCursor(output, 0, -renderedLines);
           readline.cursorTo(output, 0);
           readline.clearScreenDown(output);
           resolve(Array.from(selected));
           return;
         }
-        renderMultiSelect(items, cursor, selected, message);
+        redraw();
       };
 
-      renderMultiSelect(items, cursor, selected, message);
+      redraw();
       input.on('keypress', onKey);
     });
   } finally {
@@ -410,6 +416,7 @@ async function confirm(message, yes) {
 
 async function addCommand(args) {
   const { pack } = loadSkills();
+  const pkg = readJson(path.join(ROOT, 'package.json'));
   const project = path.resolve(args.project || '.');
   const source = consumeSourceToken(args);
   const agents = parseAgents(args.agent);
@@ -427,11 +434,12 @@ async function addCommand(args) {
     selected = await multiSelect(
       pack.skills.map(skill => ({
         value: skill.id,
-        label: `${skill.id} ${color.dim(`(${skill.packages.join(', ')})`)}`,
+        label: `${skill.id} (${skill.packages.join(', ')})`,
       })),
       pack.skills.filter(skill => skill.requiredByDefault).map(skill => skill.id),
       'Select skills to install',
     );
+    step('Select skills to install', selected.join(', '));
   } else {
     selected = resolveSkillIds(pack, requested, Boolean(args.all));
     step('Select skills to install', selected.join(', '));
@@ -457,15 +465,13 @@ async function addCommand(args) {
   }
 
   executeOperations(operations, Boolean(args.force), Boolean(args['dry-run']));
-  const manifest = writeManifest(project, pack, agents, resolution.selected, Boolean(args['dry-run']));
 
   step(args['dry-run'] ? 'Dry run complete' : 'Installation complete');
   box(
     `${args['dry-run'] ? 'Planned' : 'Installed'} ${resolution.selected.length} skills`,
     buildInstalledLines(project, operations, resolution.selected, Boolean(args['dry-run'])),
   );
-  console.log(`│  ${color.dim(`Manifest: ${displayPath(path.join(project, '.joktec-skills.json'))}`)}`);
-  console.log(`│  ${color.dim(`@joktec/skills ${manifest.version}`)}`);
+  console.log(`│  ${color.dim(`@joktec/skills ${pkg.version}`)}`);
   console.log('│');
   done('Review skills before use; they run with full agent permissions.');
 }

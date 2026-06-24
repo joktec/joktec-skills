@@ -1,6 +1,10 @@
 ---
 name: joktec-mysql-skill
 description: Use when working with @joktec/mysql in a consumer app, including MysqlModule setup, TypeORM entities, schema-first @Column/@PrimaryColumn decorators, MysqlRepo, MysqlService, transactions, dialect support, uuidv7 ids, query safety, and cursor pagination.
+metadata:
+  dependencies:
+    - joktec-framework-skill
+    - joktec-common-skill
 ---
 
 # JokTec MySQL Skill

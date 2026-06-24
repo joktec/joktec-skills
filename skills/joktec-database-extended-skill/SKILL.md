@@ -1,6 +1,10 @@
 ---
 name: joktec-database-extended-skill
 description: Use when working with extended JokTec database packages @joktec/elastic, @joktec/arango, or @joktec/bigquery in a consumer app, including app-neutral client setup, config-driven lifecycle, and package-specific query/service usage.
+metadata:
+  dependencies:
+    - joktec-framework-skill
+    - joktec-common-skill
 ---
 
 # JokTec Extended Database Skill

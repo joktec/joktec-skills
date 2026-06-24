@@ -1,6 +1,6 @@
 {
   "name": "@joktec/skills",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "sourceOfTruth": "../joktec-framework",
   "frameworkBaseline": {
     "repo": "https://github.com/joktec/joktec-framework",
@@ -41,106 +41,315 @@
       "requiredByDefault": true,
       "dependencies": [],
       "recommended": [],
-      "packages": ["@joktec/*"],
-      "scope": { "paths": ["**/*"] },
-      "triggers": ["joktec", "@joktec", "framework", "package selection"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "packages": [
+        "@joktec/*"
+      ],
+      "scope": {
+        "paths": [
+          "**/*"
+        ]
+      },
+      "triggers": [
+        "joktec",
+        "@joktec",
+        "framework",
+        "package selection"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-common-skill",
       "title": "JokTec Common Skill",
       "role": "foundation",
       "requiredByDefault": true,
-      "dependencies": ["joktec-framework-skill"],
+      "dependencies": [
+        "joktec-framework-skill"
+      ],
       "recommended": [],
-      "packages": ["@joktec/core", "@joktec/utils", "@joktec/cron", "@joktec/types"],
-      "scope": { "paths": ["packages/common/**"] },
-      "triggers": ["BaseController", "BaseService", "pagination", "config", "cron", "utils"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "packages": [
+        "@joktec/core",
+        "@joktec/utils",
+        "@joktec/cron",
+        "@joktec/types"
+      ],
+      "scope": {
+        "paths": [
+          "packages/common/**"
+        ]
+      },
+      "triggers": [
+        "BaseController",
+        "BaseService",
+        "pagination",
+        "config",
+        "cron",
+        "utils"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-mongo-skill",
       "title": "JokTec Mongo Skill",
       "role": "focused",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/mongo"],
-      "scope": { "paths": ["packages/databases/mongo/**"] },
-      "triggers": ["mongo", "mongoose", "typegoose", "MongoRepo", "cursor pagination"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/mongo"
+      ],
+      "scope": {
+        "paths": [
+          "packages/databases/mongo/**"
+        ]
+      },
+      "triggers": [
+        "mongo",
+        "mongoose",
+        "typegoose",
+        "MongoRepo",
+        "cursor pagination"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-mysql-skill",
       "title": "JokTec MySQL Skill",
       "role": "focused",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/mysql"],
-      "scope": { "paths": ["packages/databases/mysql/**"] },
-      "triggers": ["mysql", "typeorm", "MysqlRepo", "schema-first decorators", "uuidv7"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/mysql"
+      ],
+      "scope": {
+        "paths": [
+          "packages/databases/mysql/**"
+        ]
+      },
+      "triggers": [
+        "mysql",
+        "typeorm",
+        "MysqlRepo",
+        "schema-first decorators",
+        "uuidv7"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-broker-skill",
       "title": "JokTec Broker Skill",
       "role": "grouped",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/kafka", "@joktec/rabbit", "@joktec/sqs", "@joktec/redcast"],
-      "scope": { "paths": ["packages/brokers/**"] },
-      "triggers": ["kafka", "rabbit", "sqs", "redcast", "broker", "message pattern"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/kafka",
+        "@joktec/rabbit",
+        "@joktec/sqs",
+        "@joktec/redcast"
+      ],
+      "scope": {
+        "paths": [
+          "packages/brokers/**"
+        ]
+      },
+      "triggers": [
+        "kafka",
+        "rabbit",
+        "sqs",
+        "redcast",
+        "broker",
+        "message pattern"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-adapter-skill",
       "title": "JokTec Adapter Skill",
       "role": "grouped",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/cacher", "@joktec/mailer", "@joktec/notifier", "@joktec/storage"],
-      "scope": { "paths": ["packages/adapters/**"] },
-      "triggers": ["cache", "mail", "notification", "storage", "adapter"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/cacher",
+        "@joktec/mailer",
+        "@joktec/notifier",
+        "@joktec/storage"
+      ],
+      "scope": {
+        "paths": [
+          "packages/adapters/**"
+        ]
+      },
+      "triggers": [
+        "cache",
+        "mail",
+        "notification",
+        "storage",
+        "adapter"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-database-extended-skill",
       "title": "JokTec Extended Database Skill",
       "role": "grouped",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/elastic", "@joktec/arango", "@joktec/bigquery"],
-      "scope": { "paths": ["packages/databases/elastic/**", "packages/databases/arango/**", "packages/databases/bigquery/**"] },
-      "triggers": ["elastic", "arango", "bigquery", "extended database"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/elastic",
+        "@joktec/arango",
+        "@joktec/bigquery"
+      ],
+      "scope": {
+        "paths": [
+          "packages/databases/elastic/**",
+          "packages/databases/arango/**",
+          "packages/databases/bigquery/**"
+        ]
+      },
+      "triggers": [
+        "elastic",
+        "arango",
+        "bigquery",
+        "extended database"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-integration-skill",
       "title": "JokTec Integration Skill",
       "role": "grouped",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/firebase", "@joktec/gpt"],
-      "scope": { "paths": ["packages/integrations/**"] },
-      "triggers": ["firebase", "gpt", "openai", "integration"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/firebase",
+        "@joktec/gpt"
+      ],
+      "scope": {
+        "paths": [
+          "packages/integrations/**"
+        ]
+      },
+      "triggers": [
+        "firebase",
+        "gpt",
+        "openai",
+        "integration"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     },
     {
       "id": "joktec-tool-skill",
       "title": "JokTec Tool Skill",
       "role": "grouped",
       "requiredByDefault": false,
-      "dependencies": ["joktec-framework-skill"],
-      "recommended": ["joktec-common-skill"],
-      "packages": ["@joktec/http", "@joktec/file", "@joktec/alert"],
-      "scope": { "paths": ["packages/tools/**"] },
-      "triggers": ["http", "axios", "file", "alert", "tool"],
-      "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }
+      "dependencies": [
+        "joktec-framework-skill",
+        "joktec-common-skill"
+      ],
+      "recommended": [],
+      "packages": [
+        "@joktec/http",
+        "@joktec/file",
+        "@joktec/alert"
+      ],
+      "scope": {
+        "paths": [
+          "packages/tools/**"
+        ]
+      },
+      "triggers": [
+        "http",
+        "axios",
+        "file",
+        "alert",
+        "tool"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
     }
   ]
 }

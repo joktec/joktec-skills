@@ -1,6 +1,10 @@
 ---
 name: joktec-adapter-skill
 description: Use when wiring or using JokTec adapter packages @joktec/cacher, @joktec/mailer, @joktec/notifier, or @joktec/storage for cache, mail delivery, push notifications, object storage, config-driven clients, and app-neutral adapter services.
+metadata:
+  dependencies:
+    - joktec-framework-skill
+    - joktec-common-skill
 ---
 
 # JokTec Adapter Skill

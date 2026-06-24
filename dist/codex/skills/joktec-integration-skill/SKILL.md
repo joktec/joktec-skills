@@ -1,6 +1,10 @@
 ---
 name: joktec-integration-skill
 description: Use when wiring or using JokTec integration packages @joktec/firebase or @joktec/gpt, including validated config, SDK client lifecycle, app-neutral integration services, credentials handling, and consumer app composition.
+metadata:
+  dependencies:
+    - joktec-framework-skill
+    - joktec-common-skill
 ---
 
 # JokTec Integration Skill

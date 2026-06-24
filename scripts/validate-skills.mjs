@@ -7,6 +7,32 @@ const pack = readJson(PACK_PATH);
 const { skills } = loadSkills();
 
 const skillIds = new Set(skills.map(skill => skill.id));
+function readFrontmatterDependencies(raw) {
+  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return [];
+  const lines = match[1].split('\n');
+  const deps = [];
+  let inMetadata = false;
+  let inDependencies = false;
+  for (const line of lines) {
+    if (/^\S/.test(line)) {
+      inMetadata = line.trim() === 'metadata:';
+      inDependencies = false;
+      continue;
+    }
+    if (inMetadata && /^  dependencies:\s*$/.test(line)) {
+      inDependencies = true;
+      continue;
+    }
+    if (inDependencies) {
+      const item = line.match(/^    -\s+(.+?)\s*$/);
+      if (item) deps.push(item[1].trim());
+      else if (/^  \S/.test(line)) inDependencies = false;
+    }
+  }
+  return deps;
+}
+
 for (const meta of pack.skills) {
   if (!skillIds.has(meta.id)) errors.push(`Missing skill directory for metadata id: ${meta.id}`);
   for (const dependency of meta.dependencies || []) {
@@ -37,6 +63,12 @@ for (const skill of skills) {
   if (skill.frontmatter.name !== skill.id) errors.push(`${skill.id}: frontmatter name must match folder name`);
   if (!skill.frontmatter.description || skill.frontmatter.description.length < 80) {
     errors.push(`${skill.id}: description is missing or too short for reliable triggering`);
+  }
+  const meta = pack.skills.find(item => item.id === skill.id);
+  const declaredDeps = readFrontmatterDependencies(skill.raw);
+  const packDeps = meta?.dependencies || [];
+  if (declaredDeps.join('|') !== packDeps.join('|')) {
+    errors.push(`${skill.id}: frontmatter metadata.dependencies must match skill-pack dependencies`);
   }
 
   const refs = readReferences(skill);

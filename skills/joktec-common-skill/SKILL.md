@@ -1,6 +1,9 @@
 ---
 name: joktec-common-skill
 description: Use when implementing or wiring @joktec/core, @joktec/utils, or @joktec/cron in a consumer app, especially BaseController, BaseService, pagination, config, client lifecycle, bootstrap, cron decorators, or utility helpers.
+metadata:
+  dependencies:
+    - joktec-framework-skill
 ---
 
 # JokTec Common Skill

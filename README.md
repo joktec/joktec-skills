@@ -109,19 +109,28 @@ The result is less prompt repetition, better package boundary discipline, and mo
 
 `joktec-framework-skill` is the required entrypoint skill. Installers should always include it so agents can route from a generic JokTec request to the correct focused skill.
 
-`joktec-common-skill` is the default foundation skill. Focused package skills such as Mongo, MySQL, brokers, adapters, integrations, and tools depend on the entrypoint and recommend the common skill because most package usage flows rely on core config, lifecycle, or base abstractions.
+`joktec-common-skill` is the required foundation skill. It depends on `joktec-framework-skill`. Focused package skills such as Mongo, MySQL, brokers, adapters, integrations, and tools depend on both `joktec-framework-skill` and `joktec-common-skill` because most package usage flows rely on core config, lifecycle, or base abstractions.
 
 Dependency metadata lives in `skill-pack.json`:
 
 ```json
 {
   "id": "joktec-mongo-skill",
-  "dependencies": ["joktec-framework-skill"],
-  "recommended": ["joktec-common-skill"]
+  "dependencies": ["joktec-framework-skill", "joktec-common-skill"],
+  "recommended": []
 }
 ```
 
-The CLI resolves `dependencies` automatically. `recommended` skills are shown to the user and can be installed with `--yes` or explicit selection.
+The `@joktec/skills` CLI resolves `dependencies` automatically.
+
+The ecosystem `npx skills` CLI currently installs exactly the skills selected in its prompt. When using it, select dependencies manually or pass them explicitly:
+
+```bash
+npx skills add joktec/joktec-skills -a codex --project . \
+  --skill joktec-framework-skill joktec-common-skill joktec-mongo-skill
+```
+
+`npx skills` also writes a project-level `skills-lock.json`. Keep that file if the project wants reproducible skill updates or restore support through the ecosystem CLI.
 
 ---
 
@@ -195,6 +204,13 @@ Install focused skills. Required dependencies are included automatically:
 
 ```bash
 npx @joktec/skills add mongo,mysql --agent codex --project .
+```
+
+Using the ecosystem `skills` CLI:
+
+```bash
+npx skills add joktec/joktec-skills -a codex --project . \
+  --skill joktec-framework-skill joktec-common-skill joktec-mongo-skill
 ```
 
 Install for multiple agents:
