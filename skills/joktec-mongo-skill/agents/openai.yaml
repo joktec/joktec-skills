@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Mongo"
+  short_description: "Use JokTec MongoDB package safely"
+  default_prompt: "Use $joktec-mongo-skill when implementing a Mongo-backed JokTec resource."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Tools"
+  short_description: "Use JokTec utility tool packages"
+  default_prompt: "Use $joktec-tool-skill when using JokTec HTTP, file, or alert tools."

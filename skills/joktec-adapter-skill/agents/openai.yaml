@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Adapters"
+  short_description: "Use JokTec adapter packages"
+  default_prompt: "Use $joktec-adapter-skill when wiring JokTec adapters."

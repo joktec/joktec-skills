@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Brokers"
+  short_description: "Use JokTec messaging packages"
+  default_prompt: "Use $joktec-broker-skill when wiring JokTec broker clients or decorators."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec MySQL"
+  short_description: "Use the JokTec TypeORM wrapper"
+  default_prompt: "Use $joktec-mysql-skill when implementing a relational JokTec resource."

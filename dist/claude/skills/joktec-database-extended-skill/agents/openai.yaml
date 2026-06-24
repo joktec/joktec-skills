@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Extended DB"
+  short_description: "Use extended database packages"
+  default_prompt: "Use $joktec-database-extended-skill when using JokTec Elastic, Arango, or BigQuery."

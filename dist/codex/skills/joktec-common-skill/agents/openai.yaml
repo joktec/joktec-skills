@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Common"
+  short_description: "Use core, utilities, and cron"
+  default_prompt: "Use $joktec-common-skill when wiring JokTec core, utils, or cron."

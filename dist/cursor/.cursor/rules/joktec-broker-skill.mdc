@@ -1,0 +1,44 @@
+---
+description: Use when wiring or using JokTec broker packages @joktec/kafka, @joktec/rabbit, @joktec/sqs, or @joktec/redcast, including client config, producer decorators, consumer loaders, message handlers, auto-binding, and app-level broker flows.
+globs: packages/brokers/**
+alwaysApply: false
+---
+
+# JokTec Broker Skill
+
+Use this skill for message broker packages.
+
+## Packages
+
+- `@joktec/kafka`: Kafka client, decorators, loaders, metrics.
+- `@joktec/rabbit`: RabbitMQ client, decorators, auto-binding, metrics.
+- `@joktec/sqs`: AWS SQS/SNS queue and topic wrapper.
+- `@joktec/redcast`: Redis-backed broker behavior.
+
+## Rules
+
+- Keep message business semantics in the consumer app.
+- Use broker decorators for transport wiring, not for domain policy.
+- Preserve config-driven client selection and `conId` when available.
+- Keep topic, queue, and routing names explicit in app configuration or decorators.
+
+## Reference
+
+Read `references/brokers.md` for setup and package-specific notes.
+
+## Bundled References
+
+### references/brokers.md
+
+# Broker Usage
+
+## Runtime Pattern
+
+Broker services follow `AbstractClientService` lifecycle. Loader classes discover decorator metadata after module initialization. Apps define producers, consumers, and message semantics.
+
+## Package Notes
+
+- Kafka: check topic existence and broker advertised listeners in local development.
+- RabbitMQ: use module options and decorators for exchanges, queues, and bindings.
+- SQS: local ElasticMQ-style environments may require queues to exist before consumers start.
+- Redcast: use Redis-backed list, stream, or pub/sub behavior when a lightweight broker is enough.

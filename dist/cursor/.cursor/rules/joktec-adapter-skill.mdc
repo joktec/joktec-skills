@@ -1,0 +1,44 @@
+---
+description: Use when wiring or using JokTec adapter packages @joktec/cacher, @joktec/mailer, @joktec/notifier, or @joktec/storage for cache, mail delivery, push notifications, object storage, config-driven clients, and app-neutral adapter services.
+globs: packages/adapters/**
+alwaysApply: false
+---
+
+# JokTec Adapter Skill
+
+Use this skill for pluggable external capability adapters.
+
+## Packages
+
+- `@joktec/cacher`: cache stores.
+- `@joktec/mailer`: mail delivery.
+- `@joktec/notifier`: push notifications.
+- `@joktec/storage`: object storage and file metadata helpers.
+
+## Rules
+
+- Keep adapter services app-neutral.
+- Use validated config and `conId` where supported.
+- Keep secrets and credentials in app config or runtime environment, never in code.
+- Prefer adapter services over direct SDK usage in app services.
+
+## Reference
+
+Read `references/adapters.md` for setup and package-specific notes.
+
+## Bundled References
+
+### references/adapters.md
+
+# Adapter Usage
+
+## Runtime Pattern
+
+Adapters are global Nest modules. Services own native client creation and expose package-specific operations.
+
+## Package Notes
+
+- Cacher: choose local, Redis, or Memcached stores based on runtime config.
+- Mailer: centralize mail transport configuration in the service that owns outbound email.
+- Notifier: keep push provider configuration outside app business logic.
+- Storage: keep storage metadata and object operations behind the adapter service.

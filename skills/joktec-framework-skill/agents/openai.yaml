@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Framework"
+  short_description: "Route JokTec package usage flows"
+  default_prompt: "Use $joktec-framework-skill to choose the right JokTec package guidance."

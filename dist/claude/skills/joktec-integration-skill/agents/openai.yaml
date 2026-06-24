@@ -1,0 +1,4 @@
+interface:
+  display_name: "JokTec Integrations"
+  short_description: "Use JokTec integration packages"
+  default_prompt: "Use $joktec-integration-skill when wiring JokTec Firebase or GPT integrations."

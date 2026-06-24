@@ -1,0 +1,18 @@
+{
+  "name": "joktec-skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hybrid agent skill pack for using @joktec/* libraries in consumer projects.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-skills.mjs",
+    "build": "node scripts/build-skill-folders.mjs && node scripts/build-cursor-rules.mjs && node scripts/build-gemini-md.mjs && node scripts/build-copilot-instructions.mjs && node scripts/build-windsurf-rules.mjs",
+    "build:skills": "node scripts/build-skill-folders.mjs",
+    "build:cursor": "node scripts/build-cursor-rules.mjs",
+    "build:gemini": "node scripts/build-gemini-md.mjs",
+    "build:copilot": "node scripts/build-copilot-instructions.mjs",
+    "build:windsurf": "node scripts/build-windsurf-rules.mjs",
+    "sync:check": "node scripts/sync-from-joktec-framework.mjs --check"
+  }
+}
