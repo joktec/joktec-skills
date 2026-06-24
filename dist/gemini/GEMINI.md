@@ -1,4 +1,4 @@
-# joktec-skills
+# @joktec/skills
 
 Use these instructions when working in a project that consumes JokTec packages.
 

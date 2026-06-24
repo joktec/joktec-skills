@@ -9,6 +9,20 @@ const { skills } = loadSkills();
 const skillIds = new Set(skills.map(skill => skill.id));
 for (const meta of pack.skills) {
   if (!skillIds.has(meta.id)) errors.push(`Missing skill directory for metadata id: ${meta.id}`);
+  for (const dependency of meta.dependencies || []) {
+    if (!skillIds.has(dependency)) errors.push(`${meta.id}: missing dependency skill ${dependency}`);
+    if (dependency === meta.id) errors.push(`${meta.id}: cannot depend on itself`);
+  }
+  for (const recommended of meta.recommended || []) {
+    if (!skillIds.has(recommended)) errors.push(`${meta.id}: missing recommended skill ${recommended}`);
+    if (recommended === meta.id) errors.push(`${meta.id}: cannot recommend itself`);
+  }
+}
+
+const entrypoints = pack.skills.filter(meta => meta.role === 'entrypoint');
+if (entrypoints.length !== 1) errors.push(`Expected exactly one entrypoint skill, found ${entrypoints.length}`);
+if (!entrypoints.some(meta => meta.id === 'joktec-framework-skill')) {
+  errors.push('joktec-framework-skill must be the entrypoint skill');
 }
 
 const secretPatterns = [

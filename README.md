@@ -22,10 +22,12 @@ JokTec Skills turns the current JokTec framework knowledge into portable, agent-
 - [Skill Catalog](#skill-catalog)
 - [Quick Skill Finder](#quick-skill-finder)
 - [Quick Start](#quick-start)
+- [CLI Usage](#cli-usage)
 - [Install Into Agents](#install-into-agents)
 - [Generated Adapters](#generated-adapters)
 - [Repository Layout](#repository-layout)
 - [Maintenance Workflow](#maintenance-workflow)
+- [Publish Workflow](#publish-workflow)
 - [Source Of Truth](#source-of-truth)
 - [License](#license)
 
@@ -103,6 +105,24 @@ The result is less prompt repetition, better package boundary discipline, and mo
 | `joktec-integration-skill` | `@joktec/firebase`, `@joktec/gpt` | You wire Firebase or GPT/OpenAI-style integrations. |
 | `joktec-tool-skill` | `@joktec/http`, `@joktec/file`, `@joktec/alert` | You use shared HTTP, file, or alert utility services. |
 
+## Skill Dependencies
+
+`joktec-framework-skill` is the required entrypoint skill. Installers should always include it so agents can route from a generic JokTec request to the correct focused skill.
+
+`joktec-common-skill` is the default foundation skill. Focused package skills such as Mongo, MySQL, brokers, adapters, integrations, and tools depend on the entrypoint and recommend the common skill because most package usage flows rely on core config, lifecycle, or base abstractions.
+
+Dependency metadata lives in `skill-pack.json`:
+
+```json
+{
+  "id": "joktec-mongo-skill",
+  "dependencies": ["joktec-framework-skill"],
+  "recommended": ["joktec-common-skill"]
+}
+```
+
+The CLI resolves `dependencies` automatically. `recommended` skills are shown to the user and can be installed with `--yes` or explicit selection.
+
 ---
 
 ## Quick Skill Finder
@@ -123,7 +143,15 @@ The result is less prompt repetition, better package boundary discipline, and mo
 
 ## Quick Start
 
-Clone or place this repository next to `joktec-framework`:
+After publishing, install skills into a project with `npx`:
+
+```bash
+cd path/to/consumer-project
+npx @joktec/skills add mongo --agent codex --project .
+npx @joktec/skills doctor --project .
+```
+
+For local development before publish, clone or place this repository next to `joktec-framework`:
 
 ```bash
 cd ..
@@ -134,9 +162,9 @@ cd joktec-skills
 Build generated adapter outputs:
 
 ```bash
-npm run build
-npm run validate
-npm run sync:check
+pnpm run build
+pnpm run validate
+pnpm run sync:check
 ```
 
 Use the canonical skills directly from:
@@ -153,15 +181,70 @@ dist/
 
 ---
 
+## CLI Usage
+
+`@joktec/skills` ships a project-level CLI. It does not install into global agent folders such as `~/.agents/skills` or `~/.codex/skills` unless you explicitly point `--project` there.
+
+Install default skills for Codex:
+
+```bash
+npx @joktec/skills add --agent codex --project .
+```
+
+Install focused skills. Required dependencies are included automatically:
+
+```bash
+npx @joktec/skills add mongo,mysql --agent codex --project .
+```
+
+Install for multiple agents:
+
+```bash
+npx @joktec/skills install --all --agent all --project . --yes
+```
+
+Preview writes without changing files:
+
+```bash
+npx @joktec/skills add mongo --agent cursor --project . --dry-run
+```
+
+Check detected `@joktec/*` package versions against the skill baseline:
+
+```bash
+npx @joktec/skills doctor --project .
+```
+
+List available skills:
+
+```bash
+npx @joktec/skills list
+```
+
+---
+
 ## Install Into Agents
 
 ### Codex
 
-Copy the generated skill folders into your Codex skills directory:
+Project-level install:
 
 ```bash
-mkdir -p ~/.codex/skills
-cp -R dist/codex/skills/* ~/.codex/skills/
+npx @joktec/skills add --agent codex --project .
+```
+
+This creates:
+
+```text
+.agents/skills/joktec-framework-skill/
+.agents/skills/joktec-common-skill/
+```
+
+Manual copy alternative:
+
+```bash
+mkdir -p .agents/skills
+cp -R dist/codex/skills/* .agents/skills/
 ```
 
 Then invoke a skill explicitly:
@@ -172,7 +255,13 @@ Use $joktec-framework-skill to decide which JokTec package skill applies.
 
 ### Claude
 
-Copy generated skill folders into your Claude skills directory or project-level Claude skill folder:
+Project-level install:
+
+```bash
+npx @joktec/skills add --agent claude --project .
+```
+
+Manual copy alternative:
 
 ```bash
 mkdir -p .claude/skills
@@ -187,7 +276,13 @@ Use joktec-mysql-skill when implementing relational resources with @joktec/mysql
 
 ### Cursor
 
-Copy generated Cursor rules into a consumer project:
+Project-level install:
+
+```bash
+npx @joktec/skills add --agent cursor --project .
+```
+
+Manual copy alternative:
 
 ```bash
 mkdir -p .cursor/rules
@@ -198,7 +293,13 @@ Cursor will load matching rules based on the generated `globs` metadata.
 
 ### Gemini
 
-Copy the generated Gemini context file:
+Project-level install:
+
+```bash
+npx @joktec/skills add --agent gemini --project .
+```
+
+Manual copy alternative:
 
 ```bash
 cp dist/gemini/GEMINI.md ./GEMINI.md
@@ -208,7 +309,13 @@ For larger projects, keep this as a project-level context file and refresh it wh
 
 ### GitHub Copilot
 
-Copy generated Copilot instructions:
+Project-level install:
+
+```bash
+npx @joktec/skills add --agent copilot --project .
+```
+
+Manual copy alternative:
 
 ```bash
 mkdir -p .github
@@ -217,7 +324,13 @@ cp dist/copilot/.github/copilot-instructions.md .github/copilot-instructions.md
 
 ### Windsurf
 
-Copy generated Windsurf rules:
+Project-level install:
+
+```bash
+npx @joktec/skills add --agent windsurf --project .
+```
+
+Manual copy alternative:
 
 ```bash
 mkdir -p .windsurf/rules
@@ -231,7 +344,7 @@ cp -R dist/windsurf/.windsurf/rules/* .windsurf/rules/
 Run:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 Output:
@@ -305,10 +418,44 @@ https://github.com/joktec/joktec-framework
 After edits:
 
 ```bash
-npm run build
-npm run sync:check
-npm run validate
+pnpm run build
+pnpm run sync:check
+pnpm run validate
 ```
+
+---
+
+## Publish Workflow
+
+This repository is a single npm package, not a Lerna/Nx monorepo.
+
+Package manager target:
+
+```bash
+pnpm --version
+```
+
+Dry-run the publish package:
+
+```bash
+pnpm run pack:check
+```
+
+Publish to the public npm registry:
+
+```bash
+pnpm run publish:registry
+```
+
+One-command version bump plus publish:
+
+```bash
+pnpm run release:patch
+pnpm run release:minor
+pnpm run release:major
+```
+
+`publish:registry` runs build, validation, source sync check, and `pnpm pack --dry-run` before publishing.
 
 ---
 

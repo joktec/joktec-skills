@@ -1,11 +1,54 @@
 {
-  "name": "joktec-skills",
+  "name": "@joktec/skills",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "Hybrid agent skill pack for using @joktec/* libraries in consumer projects.",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@11.8.0",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "keywords": [
+    "joktec",
+    "skills",
+    "agent",
+    "codex",
+    "claude",
+    "cursor",
+    "gemini",
+    "copilot",
+    "windsurf"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joktec/joktec-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joktec/joktec-skills/issues"
+  },
+  "homepage": "https://github.com/joktec/joktec-skills#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "bin": {
+    "skills": "./bin/joktec-skills.mjs",
+    "joktec-skills": "./bin/joktec-skills.mjs"
+  },
+  "files": [
+    "AGENTS.md",
+    "LICENSE",
+    "README.md",
+    "adapters",
+    "bin",
+    "dist",
+    "scripts",
+    "skill-pack.json",
+    "skills"
+  ],
   "scripts": {
+    "check": "node scripts/validate-skills.mjs && node scripts/sync-from-joktec-framework.mjs --check",
     "validate": "node scripts/validate-skills.mjs",
     "build": "node scripts/build-skill-folders.mjs && node scripts/build-cursor-rules.mjs && node scripts/build-gemini-md.mjs && node scripts/build-copilot-instructions.mjs && node scripts/build-windsurf-rules.mjs",
     "build:skills": "node scripts/build-skill-folders.mjs",
@@ -13,6 +56,14 @@
     "build:gemini": "node scripts/build-gemini-md.mjs",
     "build:copilot": "node scripts/build-copilot-instructions.mjs",
     "build:windsurf": "node scripts/build-windsurf-rules.mjs",
-    "sync:check": "node scripts/sync-from-joktec-framework.mjs --check"
+    "sync:check": "node scripts/sync-from-joktec-framework.mjs --check",
+    "prepack": "pnpm run build && pnpm run check",
+    "pack:check": "pnpm pack --dry-run",
+    "prepublish:check": "pnpm run build && pnpm run check && pnpm pack --dry-run",
+    "publish:dry-run": "pnpm run prepublish:check && pnpm publish --dry-run --no-git-checks --access public --registry https://registry.npmjs.org/",
+    "publish:registry": "pnpm run prepublish:check && pnpm publish --access public --registry https://registry.npmjs.org/",
+    "release:patch": "pnpm version patch && pnpm run publish:registry",
+    "release:minor": "pnpm version minor && pnpm run publish:registry",
+    "release:major": "pnpm version major && pnpm run publish:registry"
   }
 }

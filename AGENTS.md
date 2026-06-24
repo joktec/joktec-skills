@@ -78,9 +78,12 @@ Use this mode when the active context is this skill repository.
 Run these commands after changing skills or generators:
 
 ```bash
-npm run build
-npm run sync:check
-npm run validate
+pnpm run build
+pnpm run sync:check
+pnpm run validate
+pnpm run pack:check
 ```
 
-`npm run sync:check` verifies expected local `joktec-framework` source files exist. It does not replace human review of the implementation truth.
+`pnpm run sync:check` verifies expected local `joktec-framework` source files exist. It does not replace human review of the implementation truth.
+
+Use `pnpm run publish:dry-run` before publishing and `pnpm run publish:registry` only when the package is ready for npm registry release.
