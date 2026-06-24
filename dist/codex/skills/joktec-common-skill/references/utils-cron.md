@@ -11,3 +11,7 @@ Prefer package helpers over app-local reimplementation when behavior should stay
 Use `@joktec/cron` when a consumer app needs scheduled jobs, job worker contracts, or decorator-driven cron registration.
 
 Keep job business logic in the consumer app. The package provides scheduling abstractions, not domain behavior.
+
+## Types
+
+Use `@joktec/types` when a consumer workflow needs generated JokTec package config schema/type artifacts. Treat the framework repository as source-of-truth for the generated schema shape.

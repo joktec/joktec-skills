@@ -5,13 +5,14 @@ description: Use when implementing or wiring @joktec/core, @joktec/utils, or @jo
 
 # JokTec Common Skill
 
-Use this skill for shared framework primitives and low-level helpers.
+Use this skill for shared framework primitives, low-level helpers, cron utilities, and config schema type support.
 
 ## Packages
 
 - `@joktec/core`: NestJS bootstrap, modules, config, logger, metrics, base abstractions, transports, pagination, Bull.
 - `@joktec/utils`: conversion helpers, UUID/OTP/hash generators, validators, common constants.
 - `@joktec/cron`: cron decorators, schedulers, workers, and job contracts.
+- `@joktec/types`: generated config schema/type support for the JokTec package set.
 
 ## Rules
 

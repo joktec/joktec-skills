@@ -14,7 +14,7 @@
     {
       "id": "joktec-common-skill",
       "title": "JokTec Common Skill",
-      "packages": ["@joktec/core", "@joktec/utils", "@joktec/cron"],
+      "packages": ["@joktec/core", "@joktec/utils", "@joktec/cron", "@joktec/types"],
       "scope": { "paths": ["packages/common/**"] },
       "triggers": ["BaseController", "BaseService", "pagination", "config", "cron", "utils"],
       "outputs": { "codex": true, "claude": true, "cursor": true, "gemini": true, "copilot": true, "windsurf": true }

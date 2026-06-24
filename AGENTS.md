@@ -19,7 +19,7 @@ It is not the implementation source of truth. The implementation source of truth
 Always try to reference the local `joktec-framework` checkout first:
 
 ```text
-/Users/user/Project/joktec/joktec-framework
+../joktec-framework
 ```
 
 Use local files such as:

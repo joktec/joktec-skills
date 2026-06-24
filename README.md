@@ -9,12 +9,14 @@ Hybrid agent skills for using `@joktec/*` libraries in consumer projects.
 
 JokTec Skills turns the current JokTec framework knowledge into portable, agent-readable guidance. It helps coding agents understand how to wire `@joktec/core`, database repositories, brokers, adapters, integrations, and tools without copying framework internals into every project prompt.
 
-Quick Start | Skill Catalog | Agent Installation | Generated Adapters | Maintenance
+[Official Links](#official-links) | [Supported Packages](#supported-packages) | [Quick Start](#quick-start) | [Skill Catalog](#skill-catalog) | [Agent Installation](#install-into-agents)
 
 ---
 
 ## Table Of Contents
 
+- [Official Links](#official-links)
+- [Supported Packages](#supported-packages)
 - [What Is This?](#what-is-this)
 - [Why Use It?](#why-use-it)
 - [Skill Catalog](#skill-catalog)
@@ -26,6 +28,31 @@ Quick Start | Skill Catalog | Agent Installation | Generated Adapters | Maintena
 - [Maintenance Workflow](#maintenance-workflow)
 - [Source Of Truth](#source-of-truth)
 - [License](#license)
+
+---
+
+## Official Links
+
+- Framework source: [github.com/joktec/joktec-framework](https://github.com/joktec/joktec-framework)
+- NPM organization: [npmjs.com/org/joktec](https://www.npmjs.com/org/joktec)
+- Local source-of-truth path: `../joktec-framework`
+
+When local source is available, prefer local framework files over remote links. Remote links are fallback references for projects or agents that do not have the framework checkout mounted.
+
+---
+
+## Supported Packages
+
+| Group | Packages |
+| --- | --- |
+| Common | [`@joktec/core`](https://www.npmjs.com/package/@joktec/core), [`@joktec/utils`](https://www.npmjs.com/package/@joktec/utils), [`@joktec/cron`](https://www.npmjs.com/package/@joktec/cron), [`@joktec/types`](https://www.npmjs.com/package/@joktec/types) |
+| Databases | [`@joktec/mongo`](https://www.npmjs.com/package/@joktec/mongo), [`@joktec/mysql`](https://www.npmjs.com/package/@joktec/mysql), [`@joktec/elastic`](https://www.npmjs.com/package/@joktec/elastic), [`@joktec/arango`](https://www.npmjs.com/package/@joktec/arango), [`@joktec/bigquery`](https://www.npmjs.com/package/@joktec/bigquery) |
+| Brokers | [`@joktec/kafka`](https://www.npmjs.com/package/@joktec/kafka), [`@joktec/rabbit`](https://www.npmjs.com/package/@joktec/rabbit), [`@joktec/sqs`](https://www.npmjs.com/package/@joktec/sqs), [`@joktec/redcast`](https://www.npmjs.com/package/@joktec/redcast) |
+| Adapters | [`@joktec/cacher`](https://www.npmjs.com/package/@joktec/cacher), [`@joktec/mailer`](https://www.npmjs.com/package/@joktec/mailer), [`@joktec/notifier`](https://www.npmjs.com/package/@joktec/notifier), [`@joktec/storage`](https://www.npmjs.com/package/@joktec/storage) |
+| Integrations | [`@joktec/firebase`](https://www.npmjs.com/package/@joktec/firebase), [`@joktec/gpt`](https://www.npmjs.com/package/@joktec/gpt) |
+| Tools | [`@joktec/http`](https://www.npmjs.com/package/@joktec/http), [`@joktec/file`](https://www.npmjs.com/package/@joktec/file), [`@joktec/alert`](https://www.npmjs.com/package/@joktec/alert) |
+
+Each package also has source documentation in the framework repository under [`packages/`](https://github.com/joktec/joktec-framework/tree/main/packages).
 
 ---
 
@@ -67,7 +94,7 @@ The result is less prompt repetition, better package boundary discipline, and mo
 | Skill | Packages | Use When |
 | --- | --- | --- |
 | `joktec-framework-skill` | `@joktec/*` | You need the top-level router for choosing the right JokTec package skill. |
-| `joktec-common-skill` | `@joktec/core`, `@joktec/utils`, `@joktec/cron` | You work with BaseController, BaseService, config, pagination, client lifecycle, utils, or cron. |
+| `joktec-common-skill` | `@joktec/core`, `@joktec/utils`, `@joktec/cron`, `@joktec/types` | You work with BaseController, BaseService, config, pagination, client lifecycle, utils, cron, or generated config schema types. |
 | `joktec-mongo-skill` | `@joktec/mongo` | You build Mongo schemas, repositories, plugins, strict references, or cursor pagination. |
 | `joktec-mysql-skill` | `@joktec/mysql` | You build TypeORM entities, schema-first columns, repositories, transactions, dialect behavior, or cursor pagination. |
 | `joktec-broker-skill` | `@joktec/kafka`, `@joktec/rabbit`, `@joktec/sqs`, `@joktec/redcast` | You wire messaging clients, decorators, producers, consumers, queues, topics, or broker handlers. |
@@ -99,7 +126,7 @@ The result is less prompt repetition, better package boundary discipline, and mo
 Clone or place this repository next to `joktec-framework`:
 
 ```bash
-cd /Users/user/Project/joktec
+cd ..
 git clone <your-joktec-skills-repo-url> joktec-skills
 cd joktec-skills
 ```
@@ -290,7 +317,7 @@ npm run validate
 Always prefer the local framework checkout:
 
 ```text
-/Users/user/Project/joktec/joktec-framework
+../joktec-framework
 ```
 
 Relevant source files:
