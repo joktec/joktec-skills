@@ -1,0 +1,4 @@
+interface:
+  display_name: "Advanced TypeScript Design"
+  short_description: "Design advanced TypeScript APIs"
+  default_prompt: "Use $advanced-typescript-design to design or refactor TypeScript framework code with an appropriate type-safety and pattern level."

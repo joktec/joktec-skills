@@ -48,7 +48,10 @@
     "skills"
   ],
   "scripts": {
-    "check": "node scripts/validate-skills.mjs && node scripts/sync-from-joktec-framework.mjs --check",
+    "sync:version": "node scripts/sync-pack-version.mjs",
+    "check:version": "node scripts/sync-pack-version.mjs --check",
+    "version": "pnpm run sync:version",
+    "check": "pnpm run check:version && node scripts/validate-skills.mjs && node scripts/sync-from-joktec-framework.mjs --check",
     "validate": "node scripts/validate-skills.mjs",
     "build": "node scripts/build-skill-folders.mjs && node scripts/build-cursor-rules.mjs && node scripts/build-gemini-md.mjs && node scripts/build-copilot-instructions.mjs && node scripts/build-windsurf-rules.mjs",
     "build:skills": "node scripts/build-skill-folders.mjs",

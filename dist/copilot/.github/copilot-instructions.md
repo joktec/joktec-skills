@@ -951,3 +951,437 @@ Best practice:
 - Do not scatter raw Axios instances across the app when `@joktec/http` should own shared behavior.
 - Do not commit webhook URLs or proxy credentials.
 - Do not use tool packages as hidden places for app business rules.
+
+---
+
+## Advanced TypeScript Design
+
+## Overview
+
+Act as a TypeScript architecture partner. Choose the simplest design that preserves clear boundaries, runtime correctness, and useful compile-time guarantees.
+
+Use design patterns as vocabulary and pressure tests, not as decoration. Prefer local project conventions, readable APIs, and low-friction extension points before adding type-level machinery.
+
+## Architectural Mindset
+
+- Start from the domain boundary: identify entity, request/response, service, repository, client, decorator, loader, and integration responsibilities.
+- Keep public APIs narrow and stable. Make extension explicit through interfaces, abstract classes, generic constraints, or composition.
+- Use classes when lifecycle, inheritance hooks, decorators, or framework reflection matter. Use plain functions/types when behavior is stateless or purely transformational.
+- Let runtime validation and compile-time types reinforce each other. Do not pretend TypeScript types validate untrusted runtime data.
+- Do not assume TypeScript generics, interfaces, unions, or array element types exist at runtime through `reflect-metadata`.
+- Escalate type complexity only when it removes real duplication, prevents invalid states, or makes an API substantially safer.
+- Check existing code before inventing a new pattern; mirror the repository's style when it already solves the same class of problem.
+
+## Public API Compatibility
+
+- Treat exported types, classes, decorators, config objects, modules, and provider APIs as public contracts.
+- Prefer additive changes over breaking renames, deleted fields, changed generic parameter order, or narrower accepted input shapes.
+- Before changing exported generic types, check downstream inference from normal call sites and verify that common extension patterns still compile.
+- If a breaking type or runtime contract change is unavoidable, report migration impact explicitly and include the smallest migration path.
+
+## Pattern Vocabulary
+
+Use the classic catalog as shared language, including the TypeScript examples catalog from Refactoring.Guru.
+
+- Creational Patterns: Abstract Factory, Builder, Factory Method, Prototype, Singleton.
+- Structural Patterns: Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy.
+- Behavioral Patterns: Chain of Responsibility, Iterator, Memento, State, Template Method, Command, Mediator, Observer, Strategy, Visitor.
+
+Treat pattern names as a starting point for design discussion. Validate whether the implementation needs the pattern's tradeoffs, or whether a direct function, data object, or interface is enough.
+
+## Agent Workflow
+
+1. Inspect local code first when working inside a repository. Look for existing abstractions, decorators, DTO types, factory functions, lifecycle hooks, and tests.
+2. Classify the task:
+   - Use `references/simple.md` for everyday TypeScript, OOP, data modeling, classes, interfaces, types, records, maps, arrays, simple decorators, and pragmatic refactors.
+   - Use `references/advanced.md` for generic framework code, recursive mapped types, `infer`, distributed/deferred conditional types, reflection metadata, advanced decorators, type-safe builders, plugin architectures, or expert pattern selection.
+3. Choose the least complex pattern that solves the force in front of you. Record why a simpler alternative was not enough when choosing advanced machinery.
+4. Design the public surface before implementation: inputs, outputs, extension points, error behavior, lifecycle, and type inference experience.
+5. Implement incrementally. Keep runtime behavior testable, and add focused type-level checks when exported generic or decorator behavior is subtle.
+6. Review for overengineering: remove unused generic parameters, speculative base classes, unnecessary inheritance, and type utilities that do not protect a real API.
+
+## Repository Signals
+
+In JokTec-style TypeScript, expect patterns such as:
+
+- Generic request/query types with recursive conditions and sort/populate typing.
+- Factory functions that return decorated NestJS classes.
+- Abstract services and clients with template methods for lifecycle-specific behavior.
+- Decorator factories that compose validation, Swagger, transformation, metrics, and integration metadata.
+- Loader/registry patterns that collect decorator metadata and wire runtime behavior during module initialization.
+
+## Bundled References
+
+### references/advanced.md
+
+# Advanced TypeScript Design Guidance
+
+Use this reference for framework-level TypeScript, generic libraries, decorator infrastructure, metadata-driven loaders, and APIs where compile-time inference is part of the product experience.
+
+## Escalation Criteria
+
+Reach for advanced TypeScript only when at least one is true:
+
+- The API is reused widely and type inference prevents real misuse.
+- The runtime model is already generic, recursive, or metadata-driven.
+- The abstraction eliminates repeated boilerplate across many entities, DTOs, repositories, services, clients, or transports.
+- The type-level design mirrors a stable domain contract, not a speculative future.
+- Tests or examples can prove both runtime behavior and developer ergonomics.
+
+If the advanced type exists only to feel clever, delete it.
+
+## Infer, Conditional, and Deferred Types
+
+- Use `infer` to extract return types, payloads, entity types, DTO shapes, tuple elements, and callback signatures from source contracts.
+- Control distributive conditional types intentionally. Wrap operands in tuples, such as `[T] extends [U]`, when union distribution is not wanted.
+- Prefer named intermediate aliases when nested conditionals exceed two branches.
+- Use `never` as a filter, but verify that it cannot erase useful error information from public APIs.
+- Treat deferred conditional types and generic inference as public UX: callers should get helpful autocomplete and errors without manual type arguments.
+
+## Recursive and Mapped Types
+
+- Use recursive mapped types for query languages, nested sort/select/populate APIs, deep partials, and entity graph traversal.
+- Add clear stop conditions for primitives, dates, arrays, functions, and branded values.
+- Use branded or opaque types for special primitives such as `ObjectId`, `UserId`, tenant IDs, cursors, or external reference IDs when plain strings would blur domain boundaries.
+- Avoid infinite or overly expensive type recursion. Keep recursion shallow enough for editor performance.
+- Preserve optionality and readonly modifiers intentionally with `+?`, `-?`, `readonly`, and `-readonly`.
+- Separate query operator typing from entity typing so the operator model remains testable and reusable.
+
+## Reflection and Decorators
+
+- Use `reflect-metadata` only when runtime type information materially improves the API: schema generation, validation composition, serialization, dependency injection, or loader registration.
+- Remember that reflected TypeScript types are lossy at runtime. Arrays, unions, generics, and interfaces need explicit options or factories.
+- Prefer decorator factories that normalize options, resolve type factories, compose framework decorators, and define one clear metadata contract.
+- Keep advanced decorators thin at the call site and explicit internally: clone options, sanitize runtime-only fields, then compose validators, transformers, docs, and persistence metadata.
+- For method decorators, preserve `this`, return values, thrown errors, and async behavior unless the decorator explicitly changes them.
+- Use function source parsing only as a last-resort runtime technique for decorator infrastructure, such as mapping method argument names. Keep it isolated, deterministic, and covered by tests because minification, transpilation, defaults, destructuring, and comments can break it.
+- Test decorator behavior through a class that uses it, especially for metadata, wrapping behavior, and dependency injection.
+
+## Type-Level Verification
+
+- Add type-level tests when changing exported generic utilities, query DSLs, decorators, builders, or public inference-heavy APIs.
+- Prefer the project's existing compile/type test setup. If available, use `tsd`, `expect-type`, `vitest`/`jest` type helpers, or a dedicated `tsc --noEmit` fixture.
+- Include positive inference examples from normal call sites, not only explicit generic arguments.
+- Include negative examples with `@ts-expect-error` when an invalid state must stay rejected.
+- Verify runtime tests separately when decorators, reflection metadata, validation, transformation, or loaders are involved.
+
+## Expert Pattern Selection
+
+- Abstract Factory fits families of related clients, repositories, or transport adapters that must be created consistently.
+- Builder fits fluent configuration with required-step guarantees; type-state builders can enforce completeness but should stay readable.
+- Factory Method fits framework hooks that create DTOs, pagination wrappers, controllers, or provider instances.
+- Prototype fits cloning configured objects when construction is expensive or stateful.
+- Singleton should usually be delegated to the DI container; avoid hand-rolled global state.
+- Adapter fits third-party client normalization and migration layers.
+- Bridge fits separating abstraction from implementation, such as transport-agnostic messaging APIs over Rabbit, Kafka, or Redis.
+- Composite fits tree-shaped filters, pipelines, menu/routes, or nested query conditions.
+- Decorator fits metrics, retries, circuit breakers, serialization, validation, or publishing side effects around existing behavior.
+- Facade fits a stable service hiding multiple low-level collaborators.
+- Flyweight fits large repeated metadata or schema objects only after measuring memory pressure.
+- Proxy fits lazy clients, caching, access control, retries, and remote boundaries.
+- Chain of Responsibility fits validation, middleware, parsing, and request pipelines.
+- Command fits queued work, replayable operations, and undoable actions.
+- Iterator fits cursor pagination and collection traversal without exposing storage details.
+- Mediator fits module coordination where direct dependencies would become tangled.
+- Memento fits snapshots, rollbacks, and state restoration.
+- Observer fits event streams and pub/sub, with explicit unsubscribe and error policy.
+- State fits lifecycle-heavy clients, jobs, or connections with mode-specific behavior.
+- Strategy fits interchangeable algorithms selected by config or runtime context.
+- Template Method fits abstract base services/clients that own lifecycle while subclasses implement `init`, `start`, `stop`, `validate`, or `transform` steps.
+- Visitor fits operations over stable object structures when adding new operations is more common than adding new node types.
+
+## Symbolic Examples
+
+Use examples like these as compact templates for thinking. Keep production implementations smaller or larger depending on the actual force.
+
+### Type-Safe Event Map
+
+```typescript
+type EventMap = {
+  "user.created": { id: string };
+  "invoice.paid": { invoiceId: string; amount: number };
+};
+
+class EventBus<TEvents extends Record<string, unknown>> {
+  on<K extends keyof TEvents>(event: K, handler: (payload: TEvents[K]) => void) {}
+  emit<K extends keyof TEvents>(event: K, payload: TEvents[K]) {}
+}
+
+const bus = new EventBus<EventMap>();
+bus.emit("invoice.paid", { invoiceId: "inv_1", amount: 100 });
+```
+
+Use this for Observer/Mediator-style APIs where event names and payloads must stay coupled.
+
+### API Contract Inference
+
+```typescript
+type Endpoint = {
+  "/users/:id": {
+    GET: { params: { id: string }; response: User };
+    PATCH: { params: { id: string }; body: Partial<User>; response: User };
+  };
+};
+
+type ResponseOf<T> = T extends { response: infer R } ? R : never;
+
+class ApiClient<TContract extends Record<string, any>> {
+  request<Path extends keyof TContract, Method extends keyof TContract[Path]>(
+    path: Path,
+    method: Method,
+  ): Promise<ResponseOf<TContract[Path][Method]>> {
+    return null as any;
+  }
+}
+```
+
+Use this when a contract object should drive call-site inference.
+
+### Type-State Builder
+
+```typescript
+type With<K extends string> = Record<K, true>;
+
+class JobBuilder<State = {}> {
+  queue(name: string): JobBuilder<State & With<"queue">> {
+    return this as any;
+  }
+
+  handler(fn: () => Promise<void>): JobBuilder<State & With<"handler">> {
+    return this as any;
+  }
+
+  build(this: State extends With<"queue"> & With<"handler"> ? JobBuilder<State> : never) {
+    return {};
+  }
+}
+```
+
+Use this when incomplete configuration is common and worth rejecting at compile time.
+
+### Recursive Query Shape
+
+```typescript
+type Primitive = string | number | boolean | Date;
+type FieldOp<T> = T | { $eq?: T; $in?: T[] };
+type Brand<T, Name extends string> = T & { readonly __brand: Name };
+type ObjectId = Brand<string, "ObjectId">;
+
+type Query<T> = {
+  [K in keyof T]?: T[K] extends Primitive
+    ? FieldOp<T[K]>
+    : T[K] extends Array<infer U>
+      ? Query<U>
+      : Query<T[K]>;
+} & {
+  $or?: Query<T>[];
+};
+```
+
+Use this for Composite-style nested filters, but add stop conditions before expanding it.
+
+### Opaque ID Boundary
+
+```typescript
+type Brand<T, Name extends string> = T & { readonly __brand: Name };
+type UserId = Brand<string, "UserId">;
+type PostId = Brand<string, "PostId">;
+
+function asUserId(value: string): UserId {
+  return value as UserId;
+}
+
+function findUser(id: UserId) {}
+
+findUser(asUserId("u_1"));
+// @ts-expect-error raw strings are not accepted here
+findUser("u_1");
+```
+
+Use this when a domain primitive crosses many generic/query layers and accidental mixing would be costly.
+
+### Decorator Wrapper with Preserved Method Contract
+
+```typescript
+function Around(run: (next: () => unknown) => unknown): MethodDecorator {
+  return (_, __, descriptor) => {
+    const original = descriptor.value;
+
+    descriptor.value = function (...args: unknown[]) {
+      return run(() => original.apply(this, args));
+    };
+  };
+}
+```
+
+Use this for metrics, retry, logging, or publishing side effects; preserve `this`, args, return values, and thrown errors.
+
+## JokTec-Style Signals to Reuse
+
+- Recursive query typing can combine entity properties with operator unions, nested entity traversal, and logical `$or`/`$and` shapes.
+- Base services and clients commonly use Template Method: the base class owns lifecycle and shared behavior while subclasses provide specific implementation steps.
+- Controller factories can return decorated classes to avoid repetitive NestJS endpoint scaffolding while preserving DTO-specific metadata.
+- Decorator infrastructure often composes Swagger, validation, transformation, persistence, and metric behavior from one options object.
+- Rabbit loaders show a metadata registry plus module-init loader pattern: decorators declare intent; loaders resolve providers and connect runtime consumers.
+
+## Advanced Review Checklist
+
+- Does every generic parameter appear in the public contract or implementation?
+- Can inference succeed from normal call-site arguments?
+- Does the type-level model match runtime validation and transformation?
+- Are metadata keys centralized and collision-resistant?
+- Are decorator side effects documented by tests?
+- Is editor performance acceptable after adding recursive or conditional types?
+- Is there a simpler Strategy, Adapter, or function-based design that would provide the same value?
+
+### references/simple.md
+
+# Simple TypeScript Design Guidance
+
+Use this reference for ordinary application and library work where readability, stable APIs, and maintainable TypeScript matter more than type-level cleverness.
+
+## Default Practices
+
+- Prefer explicit, small interfaces for public boundaries and concrete classes for runtime behavior with lifecycle, dependency injection, or decorators.
+- Use `type` for unions, mapped shapes, conditional aliases, and composition. Use `interface` for object contracts intended to be implemented or extended.
+- Keep primitive aliases meaningful. A `UserId` alias can clarify intent, but it does not add runtime safety unless paired with validation or branding.
+- Model data with plain objects when behavior is absent. Add classes when construction, methods, inheritance hooks, decorators, or framework reflection are required.
+- Keep DTOs, entities, requests, and responses separate when they have different validation, persistence, or transport concerns.
+- Avoid `any` at public boundaries. Use `unknown` for untrusted data, then narrow or validate it.
+- Prefer narrow generic constraints such as `T extends Entity` over unconstrained `T` when the implementation depends on object semantics.
+
+## Classes, Interfaces, and OOP
+
+- Use abstract classes for shared runtime behavior, protected hooks, and constructor-injected dependencies.
+- Use interfaces for contracts that should not carry runtime behavior.
+- Prefer composition over inheritance when variants differ by collaborator rather than lifecycle.
+- Keep protected hooks purposeful: `afterInit`, `transform`, `validate`, and `map` are good when subclasses are expected to customize one stable step.
+- Avoid deep inheritance chains. If a third level appears, consider Strategy, Adapter, or composition.
+
+## Common Data Structures
+
+- Use `Record<K, V>` when the key set is known or constrained.
+- Use `{ [key: string]: V }` when the object is truly open-ended.
+- Use `Map<K, V>` when keys are not strings, insertion order matters, or frequent add/remove operations are central.
+- Use arrays for ordered collections and tuples for fixed positional contracts.
+- Use discriminated unions for state or command variants instead of loose booleans.
+- Keep hash-like caches private unless callers need iteration, eviction, or explicit lifecycle.
+
+## Basic Types and Utilities
+
+- Use union literals for finite options: status, mode, operation, direction.
+- Use `Pick`, `Omit`, `Partial`, `Required`, `Readonly`, `Record`, `Extract`, and `Exclude` before writing custom utilities.
+- Use `keyof` and indexed access types for property-safe APIs.
+- Use overloads sparingly; prefer a single options object when overloads become hard to read.
+- Keep mapped types shallow unless the data is truly nested and the API benefits from deep transformation.
+
+## Simple Decorators
+
+- Use decorator factories to attach framework metadata or compose existing decorators.
+- Keep decorator options serializable and explicit where possible.
+- Separate metadata collection from runtime execution. A decorator should usually register intent; a loader/service should execute it later.
+- Avoid parsing function source in ordinary decorators. If runtime argument-name mapping truly requires it, escalate to `advanced.md` and isolate the parser behind tests.
+- Test decorators at the behavior boundary, not only by checking metadata keys.
+
+## Pattern Choices
+
+- Use Factory Method or simple factory functions when object creation varies by type or config.
+- Use Builder for stepwise configuration only when partially built objects are common or order matters.
+- Use Adapter to normalize third-party APIs behind project interfaces.
+- Use Facade to simplify a noisy subsystem for callers.
+- Use Decorator when behavior should wrap a method/object without changing its public contract.
+- Use Template Method when a base class owns an algorithm and subclasses fill in specific steps.
+- Use Strategy when an algorithm family changes independently from the caller.
+- Use Observer or Mediator for event-style communication, but keep ownership and error handling explicit.
+
+## Symbolic Examples
+
+Use examples like these to reason about shape and tradeoffs. Keep final code adapted to the repository style.
+
+### Strategy with a Narrow Interface
+
+```typescript
+interface PriceStrategy {
+  total(items: CartItem[]): number;
+}
+
+class RetailPrice implements PriceStrategy {
+  total(items: CartItem[]) {
+    return items.reduce((sum, item) => sum + item.price, 0);
+  }
+}
+
+class WholesalePrice implements PriceStrategy {
+  total(items: CartItem[]) {
+    return items.reduce((sum, item) => sum + item.price * 0.9, 0);
+  }
+}
+
+class CheckoutService {
+  constructor(private readonly strategy: PriceStrategy) {}
+
+  quote(items: CartItem[]) {
+    return this.strategy.total(items);
+  }
+}
+```
+
+Use this when the caller should not know which algorithm is active.
+
+### Adapter for Third-Party Boundaries
+
+```typescript
+interface MessageBus {
+  publish(topic: string, payload: unknown): Promise<void>;
+}
+
+class RabbitBusAdapter implements MessageBus {
+  constructor(private readonly rabbit: RabbitClient) {}
+
+  publish(topic: string, payload: unknown) {
+    return this.rabbit.sendToQueue(topic, JSON.stringify(payload));
+  }
+}
+```
+
+Use this when external clients have noisy or unstable APIs.
+
+### Template Method for Lifecycle Hooks
+
+```typescript
+abstract class ManagedClient<TConfig, TClient> {
+  async connect(config: TConfig) {
+    const client = await this.create(config);
+    await this.start(client);
+    return client;
+  }
+
+  protected abstract create(config: TConfig): Promise<TClient>;
+  protected abstract start(client: TClient): Promise<void>;
+}
+```
+
+Use this when the base class owns lifecycle order and subclasses fill the variable steps.
+
+### Simple Decorator Metadata
+
+```typescript
+const HANDLER_KEY = "app:handler";
+
+function Handler(name: string): MethodDecorator {
+  return (_, __, descriptor) => {
+    Reflect.defineMetadata(HANDLER_KEY, name, descriptor.value);
+  };
+}
+```
+
+Use this when methods declare intent and another loader executes it later.
+
+## Practical Review Checklist
+
+- Can a teammate understand the public API without reading private helpers?
+- Does the type design represent real runtime rules?
+- Are names domain-specific enough to explain intent?
+- Is the pattern solving current duplication or variability?
+- Are validation, transformation, persistence, and transport concerns separated?
+- Are tests focused on behavior that the abstraction promises to preserve?

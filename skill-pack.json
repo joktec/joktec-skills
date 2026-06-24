@@ -1,6 +1,6 @@
 {
   "name": "@joktec/skills",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "sourceOfTruth": "../joktec-framework",
   "frameworkBaseline": {
     "repo": "https://github.com/joktec/joktec-framework",
@@ -341,6 +341,40 @@
         "file",
         "alert",
         "tool"
+      ],
+      "outputs": {
+        "codex": true,
+        "claude": true,
+        "cursor": true,
+        "gemini": true,
+        "copilot": true,
+        "windsurf": true
+      }
+    },
+    {
+      "id": "advanced-typescript-design",
+      "title": "Advanced TypeScript Design",
+      "role": "focused",
+      "requiredByDefault": false,
+      "dependencies": [],
+      "recommended": [],
+      "packages": [
+        "TypeScript",
+        "NestJS"
+      ],
+      "scope": {
+        "paths": [
+          "**/*.ts",
+          "**/*.tsx"
+        ]
+      },
+      "triggers": [
+        "typescript",
+        "generic public APIs",
+        "conditional types",
+        "decorator metadata",
+        "type-safe query DSL",
+        "design patterns"
       ],
       "outputs": {
         "codex": true,

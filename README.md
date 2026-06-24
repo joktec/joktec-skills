@@ -1,9 +1,9 @@
 # JokTec Skills
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
-![Skills](https://img.shields.io/badge/skills-9-blue.svg)
+![Skills](https://img.shields.io/badge/skills-10-blue.svg)
 ![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot%20%7C%20Windsurf-purple.svg)
-![Version](https://img.shields.io/badge/version-0.1.0-lightgrey.svg)
+![Version](https://img.shields.io/badge/version-0.1.4-lightgrey.svg)
 
 Hybrid agent skills for using `@joktec/*` libraries in consumer projects.
 
@@ -104,6 +104,7 @@ The result is less prompt repetition, better package boundary discipline, and mo
 | `joktec-database-extended-skill` | `@joktec/elastic`, `@joktec/arango`, `@joktec/bigquery` | You use additional database clients outside Mongo/MySQL. |
 | `joktec-integration-skill` | `@joktec/firebase`, `@joktec/gpt` | You wire Firebase or GPT/OpenAI-style integrations. |
 | `joktec-tool-skill` | `@joktec/http`, `@joktec/file`, `@joktec/alert` | You use shared HTTP, file, or alert utility services. |
+| `advanced-typescript-design` | TypeScript, NestJS | You design or refactor framework-style TypeScript APIs, advanced generic types, decorators, lifecycle abstractions, or pattern-heavy library code. |
 
 ## Skill Dependencies
 
@@ -147,6 +148,7 @@ npx skills add joktec/joktec-skills -a codex --project . \
 | "Use Elastic, Arango, or BigQuery" | `joktec-database-extended-skill` |
 | "Use Firebase or GPT package" | `joktec-integration-skill` |
 | "Use HTTP/file/alert helpers" | `joktec-tool-skill` |
+| "Design advanced TypeScript APIs or decorators" | `advanced-typescript-design` |
 
 ---
 
