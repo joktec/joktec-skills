@@ -60,8 +60,8 @@
     "prepack": "pnpm run build && pnpm run check",
     "pack:check": "pnpm pack --dry-run",
     "prepublish:check": "pnpm run build && pnpm run check && pnpm pack --dry-run",
-    "publish:dry-run": "pnpm run prepublish:check && pnpm publish --dry-run --no-git-checks --access public --registry https://registry.npmjs.org/",
-    "publish:registry": "pnpm run prepublish:check && pnpm publish --access public --registry https://registry.npmjs.org/",
+    "publish:dry-run": "pnpm run prepublish:check && pnpm publish --dry-run --no-git-checks --access public",
+    "publish:registry": "pnpm run prepublish:check && pnpm publish --access public",
     "release:patch": "pnpm version patch && pnpm run publish:registry",
     "release:minor": "pnpm version minor && pnpm run publish:registry",
     "release:major": "pnpm version major && pnpm run publish:registry"
