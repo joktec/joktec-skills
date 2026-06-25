@@ -47,6 +47,7 @@ Wrapper philosophy:
 
 - prefer one schema declaration that carries persistence, validation, transform, and Swagger metadata
 - use wrapper options before duplicating `@ApiProperty`, `@Expose`, `@Type`, or common validators
+- do not add `swagger.type` for normal scalar/date fields, arrays, nested JSON classes, or relations when the wrapper can infer the shape
 - use raw TypeORM only for advanced cases that the wrapper does not model cleanly
 - keep storage write behavior and API documentation behavior distinct when needed
 
@@ -85,11 +86,31 @@ Common mappings:
 | `@Expose()` | default behavior of `@Column(...)` |
 | `@Expose({ groups })` | `@Column({ groups })` |
 | `@Exclude({ toPlainOnly: true })` plus hidden Swagger | `@Column({ hidden: true })` |
-| `@ApiProperty(...)` | `@Column({ swagger: ... })`, or native options such as `example`, `comment`, `deprecated`, `min`, `max`, `minLength`, `maxLength` |
+| `@ApiProperty(...)` | Prefer native options such as `example`, `comment`, `deprecated`, `min`, `max`, `minLength`, `maxLength`; use `swagger` only as an override |
 | `@ValidateNested()` + `@Type(() => Preference)` | `@Column('jsonb', { nested: Preference })` |
 | `@ValidateNested({ each: true })` + `@Type(() => Preference)` | `@Column('jsonb', { nested: Preference, each: true })` |
 | `@Expose()` + `@ApiProperty(...)` on a getter | `@Column({ kind: 'virtual', ... })` |
 | Swagger `readOnly: true` | `@Column({ immutable: true })` or TypeORM `update: false` when ORM updates must also be blocked |
+
+## Swagger Metadata Rules
+
+The `@Column` wrapper already composes Swagger metadata. During migrations, keep entity code small and avoid redundant `swagger` declarations:
+
+- Do not add `swagger: { type: String }` for string columns.
+- Do not add `swagger: { type: Number }` for numeric columns.
+- Do not add `swagger: { type: Boolean }` for boolean columns.
+- Do not add `swagger: { type: Date }` for date, datetime, or timestamp columns.
+- Do not add `swagger: { type: String, isArray: true }` for `simple-array` or reflected array fields unless the OpenAPI shape must differ from the entity field.
+- Do not add `swagger: { type: NestedClass }` when `nested: NestedClass` is already present.
+- Do not add `swagger: { type: () => Entity }` on `Column({ kind: 'relation', type: () => Entity })`; the relation wrapper keeps the Swagger type lazy to avoid circular schema evaluation.
+
+Use `swagger` only for actual overrides, for example:
+
+- an OpenAPI primitive differs from the TypeScript property type, such as a SQL decimal represented as `string`
+- a property needs `oneOf`, `anyOf`, `allOf`, custom `items`, or a deliberately shortened example
+- a generated schema needs an explicit read/write/deprecated override that cannot be represented by wrapper options
+
+If a relation wrapper still triggers a circular Swagger error in a consumer project, inspect `node_modules/@joktec/mysql/dist/decorators/column.decorator.d.ts` and the installed implementation first. Do not paper over the issue by adding `swagger.type` to every relation; identify whether the installed package version has lazy relation Swagger support.
 
 ## Read-Only Metadata
 
