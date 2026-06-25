@@ -2,13 +2,29 @@
 
 ## Source Lookup
 
-When blocked, inspect:
+When blocked in a consumer project, inspect the installed package first:
+
+- `node_modules/@joktec/mysql/README.md`
+- `node_modules/@joktec/mysql/AGENTS.md` when published with the package
+- `node_modules/@joktec/mysql/dist/index.d.ts`
+- `node_modules/@joktec/mysql/dist/decorators/column.decorator.d.ts`
+- `node_modules/@joktec/mysql/dist/decorators/columns/column.type.d.ts`
+- `node_modules/@joktec/mysql/dist/decorators/timestamp.decorator.d.ts`
+
+If the installed package is missing enough detail, use the GitHub package docs next:
+
+- `https://github.com/joktec/joktec-framework/tree/main/packages/databases/mysql`
+
+Use GitHub source only after package docs and installed types are not enough:
 
 - `packages/databases/mysql/src/decorators/table.decorator.ts`
 - `packages/databases/mysql/src/decorators/column.decorator.ts`
 - `packages/databases/mysql/src/decorators/columns/column.type.ts`
 - `packages/databases/mysql/src/decorators/columns/column.factory.ts`
 - `packages/databases/mysql/src/decorators/columns/primary.column.ts`
+- `packages/databases/mysql/src/decorators/columns/timestamp.column.ts`
+- `packages/databases/mysql/src/decorators/columns/virtual.column.ts`
+- `packages/databases/mysql/src/decorators/columns/object.column.ts`
 - `packages/databases/mysql/src/decorators/columns/string.column.ts`
 - `packages/databases/mysql/src/decorators/columns/number.column.ts`
 - `packages/databases/mysql/src/decorators/columns/transform.column.ts`
@@ -16,7 +32,7 @@ When blocked, inspect:
 
 ## Schema-First Entity Pattern
 
-Use `@Tables`, `@Column`, and `@PrimaryColumn` from `@joktec/mysql` when an entity should also act as the source class for mapped DTOs.
+Use `@Tables`, `@Column`, `@PrimaryColumn`, and `@TimestampColumn` from `@joktec/mysql` when an entity should also act as the source class for mapped DTOs.
 
 The new decorators are not thin TypeORM aliases. They are schema-first wrappers that compose:
 
@@ -25,11 +41,18 @@ The new decorators are not thin TypeORM aliases. They are schema-first wrappers 
 - `class-transformer` expose/exclude behavior.
 - Swagger property metadata.
 
-When migrating old entities, remove duplicate property decorators from `typeorm`, `class-validator`, `class-transformer`, and Swagger when the wrapper option can represent the same behavior.
+The wrapper can also represent virtual computed getters and nested JSON/jsonb class payloads. Do not use this package for Mongo/ObjectId columns.
 
-## Legacy Decorator Migration
+Wrapper philosophy:
 
-Migrate a whole property at a time. Do not only replace `PrimaryGeneratedColumn`.
+- prefer one schema declaration that carries persistence, validation, transform, and Swagger metadata
+- use wrapper options before duplicating `@ApiProperty`, `@Expose`, `@Type`, or common validators
+- use raw TypeORM only for advanced cases that the wrapper does not model cleanly
+- keep storage write behavior and API documentation behavior distinct when needed
+
+## Current Decorator Capabilities
+
+Use the package README and actual installed source for full migration details. This skill only keeps the common mappings that help an agent recognize old patterns.
 
 Common mappings:
 
@@ -38,11 +61,21 @@ Common mappings:
 | `@PrimaryGeneratedColumn()` | `@PrimaryColumn('increment')` |
 | `@PrimaryGeneratedColumn('uuid')` | `@PrimaryColumn('uuid')` |
 | app-generated ordered UUID id | `@PrimaryColumn('uuidv7')` |
+| `@CreateDateColumn(...)` | `@TimestampColumn('create', ...)` |
+| `@UpdateDateColumn(...)` | `@TimestampColumn('update', ...)` |
+| `@DeleteDateColumn(...)` | `@TimestampColumn('delete', ...)` |
+| TypeORM `@VersionColumn(...)` | `@Column({ kind: 'version', ... })` |
+| TypeORM `@VirtualColumn(...)` | `@Column({ kind: 'virtual', mode: 'sql', query, ... })` |
+| TypeORM `@ViewColumn(...)` | `@Column({ kind: 'view', ... })` |
 | `@Column(...)` | `@Column(...)` from `@joktec/mysql` |
+| `@RelationId(...)` | `@Column({ kind: 'relation-id', relationId })` |
 | `@IsNotEmpty()` | `@Column({ required: true })` |
 | `@IsOptional()` | `@Column({ required: false })` or nullable TypeORM option when storage allows null |
 | `@IsEmail()` | `@Column({ isEmail: true })` |
 | `@IsMobilePhone()` | `@Column({ isPhone: true })` |
+| `@IsInt()` | `@Column({ isInt: true })` or an integer column type |
+| `@IsUUID()` | `@Column({ isUUID: true })` |
+| `@IsObject()` | `@Column({ isObject: true })` or a JSON column |
 | `@IsHexColor()` | `@Column({ isHexColor: true })` |
 | `@IsUrl()` | `@Column({ isUrl: true })` |
 | `@MinLength(n)` | `@Column({ minLength: n })` |
@@ -53,53 +86,28 @@ Common mappings:
 | `@Expose({ groups })` | `@Column({ groups })` |
 | `@Exclude({ toPlainOnly: true })` plus hidden Swagger | `@Column({ hidden: true })` |
 | `@ApiProperty(...)` | `@Column({ swagger: ... })`, or native options such as `example`, `comment`, `deprecated`, `min`, `max`, `minLength`, `maxLength` |
+| `@ValidateNested()` + `@Type(() => Preference)` | `@Column('jsonb', { nested: Preference })` |
+| `@ValidateNested({ each: true })` + `@Type(() => Preference)` | `@Column('jsonb', { nested: Preference, each: true })` |
+| `@Expose()` + `@ApiProperty(...)` on a getter | `@Column({ kind: 'virtual', ... })` |
+| Swagger `readOnly: true` | `@Column({ immutable: true })` or TypeORM `update: false` when ORM updates must also be blocked |
 
-Preserve decorators only when the wrapper cannot express them, by passing them through `decorators: [...]`.
+## Read-Only Metadata
 
-Migration checklist:
+`immutable` is the API read-only hint used by the JokTec MySQL wrapper. TypeORM `update: false` is the ORM write behavior. The wrapper maps both to Swagger `readOnly` when appropriate:
 
-- Replace TypeORM column decorators with wrappers from `@joktec/mysql`.
-- Remove duplicate `class-validator` decorators when equivalent wrapper options exist.
-- Remove duplicate `class-transformer` decorators when `hidden` or `groups` expresses the same behavior.
-- Move Swagger examples/descriptions/limits into wrapper options where possible.
-- Preserve custom validators/transforms only through `decorators: [...]`.
-- Keep database-specific options such as `type`, `length`, `nullable`, `unique`, `default`, `enum`, and `comment`.
-- Rebuild and run entity-related tests after migration because DTO metadata and TypeORM metadata both change.
+- `immutable` has priority over `update: false`
+- `update: false` implies Swagger `readOnly` only when `immutable` is not set
+- `swagger.readOnly` remains the final explicit override
 
-Example migration:
+Some field kinds default to API read-only because they are system-managed or computed:
 
-```ts
-// Before
-@Column({ type: 'varchar', length: 255 })
-@IsEmail()
-@IsNotEmpty()
-@Expose()
-@ApiProperty({ example: 'user@example.com' })
-email!: string;
-
-// After
-@Column('varchar', {
-  length: 255,
-  required: true,
-  isEmail: true,
-  example: 'user@example.com',
-})
-email!: string;
-```
-
-For hidden fields:
-
-```ts
-// Before
-@Column({ type: 'varchar', length: 255 })
-@Exclude({ toPlainOnly: true })
-@ApiHideProperty()
-password!: string;
-
-// After
-@Column('varchar', { length: 255, hidden: true })
-password!: string;
-```
+- primary keys
+- timestamp columns
+- version columns
+- view columns
+- virtual getter and SQL virtual columns
+- relation-id columns
+- tree level columns
 
 ## Primary Keys
 

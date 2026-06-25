@@ -19,8 +19,11 @@ Use this skill for relational resources backed by JokTec's TypeORM wrapper.
 - Treat `mysql`, `mariadb`, and `postgres` as the first-class dialects.
 - Keep `sync` explicit and normally enabled only by an owner process or development bootstrap.
 - Do not add new behavior to deprecated `MysqlFinder`; use `MysqlRepo.qb()` and `MysqlHelper` paths.
-- When migrating an entity to the new schema-first decorators, migrate the whole property decorator stack, not only the TypeORM primary key decorator.
-- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
+- Use schema-first `@Column`, `@PrimaryColumn`, and `@TimestampColumn` wrappers when an entity also acts as DTO metadata.
+- Use `@Column({ kind: 'virtual' })` for computed getters that need expose/Swagger metadata without persistence.
+- Use `immutable` for API read-only metadata; TypeORM `update: false` remains storage write behavior and is also inferred as Swagger read-only when `immutable` is not set.
+- Do not use `@joktec/mysql` for Mongo/ObjectId columns, even though TypeORM has Mongo-related APIs.
+- For real migrations, inspect the installed `@joktec/mysql` source in the consumer project's `node_modules` first. If that is insufficient, read GitHub package docs, then GitHub source. Use the local `../joktec-framework` checkout only when you are working inside the JokTec development workspace.
 
 ## References
 

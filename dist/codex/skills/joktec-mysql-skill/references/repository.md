@@ -2,7 +2,21 @@
 
 ## Source Lookup
 
-When blocked, inspect:
+When blocked in a consumer project, inspect installed package docs and types first:
+
+- `node_modules/@joktec/mysql/README.md`
+- `node_modules/@joktec/mysql/AGENTS.md` when published with the package
+- `node_modules/@joktec/mysql/dist/index.d.ts`
+- `node_modules/@joktec/mysql/dist/mysql.module.d.ts`
+- `node_modules/@joktec/mysql/dist/mysql.service.d.ts`
+- `node_modules/@joktec/mysql/dist/mysql.repo.d.ts`
+- `node_modules/@joktec/mysql/dist/models/mysql.request.d.ts`
+
+If the installed package is insufficient, read GitHub package docs next:
+
+- `https://github.com/joktec/joktec-framework/tree/main/packages/databases/mysql`
+
+Use GitHub source only after installed types and package docs are not enough:
 
 - `packages/databases/mysql/README.md`
 - `packages/databases/mysql/AGENTS.md`
