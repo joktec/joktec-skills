@@ -261,9 +261,16 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Keep schema classes, app repositories, and app-specific queries in the consumer app.
 - Extend `MongoRepo<T, ID>` for app repositories.
 - Preserve `conId` when the app has multiple Mongo connections.
-- Use schema-first decorators when a schema class should be reused as a DTO source.
+- Use schema-first decorators when a schema class should be reused as a DTO source; wrappers should reduce repeated Typegoose, validator, transformer, and Swagger stacks.
+- Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
+- Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
+- Use `@Schema({ kind: 'subdocument' })` for embedded documents that need their own `_id` and timestamps.
+- Use `@Prop({ kind: 'virtual', mode: 'getter' })` for computed getters that need expose/Swagger metadata without persistence.
+- Use `@Prop({ ref: () => Target, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
+- Use `@Prop({ type: () => [Target], ref: () => Target, foreignField, localField })` for populate-array virtuals.
+- Use `@Prop({ kind: 'map', type: Object })` for map/snapshot payloads that must keep their raw shape.
 - Treat ObjectId casting and regex behavior as safety-sensitive.
-- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
+- For real migrations, inspect `node_modules/@joktec/mongo` first, then installed README or GitHub package docs, then GitHub source before assuming APIs.
 
 ## References
 
@@ -280,16 +287,18 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 
 When blocked, inspect:
 
-- `packages/databases/mongo/README.md`
-- `packages/databases/mongo/AGENTS.md`
-- `packages/databases/mongo/src/index.ts`
-- `packages/databases/mongo/src/mongo.module.ts`
-- `packages/databases/mongo/src/mongo.service.ts`
-- `packages/databases/mongo/src/mongo.repo.ts`
-- `packages/databases/mongo/src/helpers/mongo.helper.ts`
-- `packages/databases/mongo/src/helpers/mongo.pipeline.ts`
-- `packages/databases/mongo/src/helpers/mongo.utils.ts`
-- `packages/databases/mongo/src/models/*`
+- Consumer project first: `node_modules/@joktec/mongo`.
+- Installed docs next: `node_modules/@joktec/mongo/README.md`.
+- GitHub docs next: `https://github.com/joktec/joktec-framework/tree/main/packages/databases/mongo`.
+- GitHub source fallback:
+  - `packages/databases/mongo/src/index.ts`
+  - `packages/databases/mongo/src/mongo.module.ts`
+  - `packages/databases/mongo/src/mongo.service.ts`
+  - `packages/databases/mongo/src/mongo.repo.ts`
+  - `packages/databases/mongo/src/helpers/mongo.helper.ts`
+  - `packages/databases/mongo/src/helpers/mongo.pipeline.ts`
+  - `packages/databases/mongo/src/helpers/mongo.utils.ts`
+  - `packages/databases/mongo/src/models/*`
 
 ## Module Setup
 
@@ -311,7 +320,8 @@ Repository checklist:
 - Keep schema-specific query helpers in the app repository, not in controllers.
 - Use repository methods for standard reads so query parsing, soft delete, populate, and pagination stay consistent.
 - Pass transaction/session options through read-modify-write flows when the app uses transactions.
-- Normalize returned documents through repository/service response paths so ObjectId values do not leak unexpectedly into DTOs.
+- Repository read paths should return schema class instances with normalized ObjectId/string values, including populated and deep-populated values.
+- Code that needs raw Mongoose documents should use `MongoService.getModel(...)` or Typegoose/Mongoose APIs directly.
 
 ## Query Safety
 
@@ -346,13 +356,20 @@ Cursor checklist:
 
 When blocked, inspect:
 
-- `packages/databases/mongo/src/decorators/scheme.decorator.ts`
-- `packages/databases/mongo/src/decorators/prop.decorator.ts`
-- `packages/databases/mongo/src/decorators/props/*`
-- `packages/databases/mongo/src/models/mongo.schema.ts`
-- `packages/databases/mongo/src/plugins/paranoid.plugin.ts`
-- `packages/databases/mongo/src/plugins/strict-reference.plugin.ts`
-- `packages/databases/mongo/src/plugins/transform.plugin.ts`
+- Consumer project first: `node_modules/@joktec/mongo`.
+- Package docs next: `node_modules/@joktec/mongo/README.md`.
+- GitHub docs next: `https://github.com/joktec/joktec-framework/tree/main/packages/databases/mongo`.
+- GitHub source fallback:
+  - `packages/databases/mongo/src/decorators/schema.decorator.ts`
+  - `packages/databases/mongo/src/decorators/schema.options.ts`
+  - `packages/databases/mongo/src/decorators/prop.decorator.ts`
+  - `packages/databases/mongo/src/decorators/props/*`
+  - `packages/databases/mongo/src/models/mongo.ref.ts`
+  - `packages/databases/mongo/src/models/object-id.ts`
+  - `packages/databases/mongo/src/models/mongo.schema.ts`
+  - `packages/databases/mongo/src/plugins/paranoid.plugin.ts`
+  - `packages/databases/mongo/src/plugins/strict-reference.plugin.ts`
+  - `packages/databases/mongo/src/plugins/transform.plugin.ts`
 
 ## Schema Decorators
 
@@ -367,6 +384,35 @@ Best practice:
 - Pass custom validators/transforms explicitly rather than adding hidden global behavior.
 - Keep maps, snapshots, and dynamic objects explicit so helper conversion does not alter their shape.
 - Keep app-level reference semantics visible; strict reference plugin checks existence, but the app still owns domain rules.
+- Use `RefId<T>` for persisted id fields and `PopulatedRef<T>` for populated virtual instance fields.
+- Use lazy `type` resolvers such as `type: () => User` or `type: () => [User]` when the wrapper cannot infer the runtime class.
+- Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
+- Use `@Schema({ kind: 'subdocument' })` for embedded documents that need `_id` and timestamps but should not create a collection.
+- Use `@Prop({ kind: 'virtual', mode: 'getter', comment, optional, hidden, expose, swagger })` for computed getters that only need class-transformer and Swagger metadata.
+- Use `@Prop({ ref: () => User, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
+- Use `@Prop({ type: () => [User], ref: () => User, foreignField, localField })` for populate-array virtuals.
+- Use `@Prop({ kind: 'map', type: Object })` for raw maps/snapshots instead of passing `PropType.MAP` at the call site.
+
+Common mappings:
+
+| Use case | Preferred shape |
+| --- | --- |
+| Stored single reference id | `fieldId?: RefId<User>` with `@Prop({ type: ObjectId, ref: () => User })` |
+| Stored reference id array | `fieldIds?: RefId<User>[]` with `@Prop({ type: [ObjectId], ref: () => User })` |
+| Embedded value object | `@Schema({ kind: 'embedded' })` on the nested class |
+| Embedded document | `@Schema({ kind: 'subdocument' })` on the nested class |
+| Raw map/snapshot | `@Prop({ kind: 'map', type: Object })` |
+| Populated single virtual | `field?: PopulatedRef<User>` with `@Prop({ ref: () => User, foreignField: '_id', localField: 'fieldId' })` |
+| Populated virtual array | `fields?: PopulatedRef<User>[]` with `@Prop({ type: () => [User], ref: () => User, foreignField: '_id', localField: 'fieldIds' })` |
+| Computed getter | `@Prop({ kind: 'virtual', mode: 'getter', comment: '...' }) get value() { ... }` |
+
+Populate inference:
+
+- `ref` + `localField` + `foreignField` marks the field as virtual populate.
+- Populate-one can fallback to the same class from `ref`.
+- Populate arrays still need `type: () => [Target]` because runtime reflection only sees `Array`.
+- `justOne` defaults to `true` for non-array populate fields.
+- Swagger examples default to `{}` or `[]` for populated fields unless explicitly overridden.
 
 ## Plugins
 

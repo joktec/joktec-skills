@@ -4,16 +4,18 @@
 
 When blocked, inspect:
 
-- `packages/databases/mongo/README.md`
-- `packages/databases/mongo/AGENTS.md`
-- `packages/databases/mongo/src/index.ts`
-- `packages/databases/mongo/src/mongo.module.ts`
-- `packages/databases/mongo/src/mongo.service.ts`
-- `packages/databases/mongo/src/mongo.repo.ts`
-- `packages/databases/mongo/src/helpers/mongo.helper.ts`
-- `packages/databases/mongo/src/helpers/mongo.pipeline.ts`
-- `packages/databases/mongo/src/helpers/mongo.utils.ts`
-- `packages/databases/mongo/src/models/*`
+- Consumer project first: `node_modules/@joktec/mongo`.
+- Installed docs next: `node_modules/@joktec/mongo/README.md`.
+- GitHub docs next: `https://github.com/joktec/joktec-framework/tree/main/packages/databases/mongo`.
+- GitHub source fallback:
+  - `packages/databases/mongo/src/index.ts`
+  - `packages/databases/mongo/src/mongo.module.ts`
+  - `packages/databases/mongo/src/mongo.service.ts`
+  - `packages/databases/mongo/src/mongo.repo.ts`
+  - `packages/databases/mongo/src/helpers/mongo.helper.ts`
+  - `packages/databases/mongo/src/helpers/mongo.pipeline.ts`
+  - `packages/databases/mongo/src/helpers/mongo.utils.ts`
+  - `packages/databases/mongo/src/models/*`
 
 ## Module Setup
 
@@ -35,7 +37,8 @@ Repository checklist:
 - Keep schema-specific query helpers in the app repository, not in controllers.
 - Use repository methods for standard reads so query parsing, soft delete, populate, and pagination stay consistent.
 - Pass transaction/session options through read-modify-write flows when the app uses transactions.
-- Normalize returned documents through repository/service response paths so ObjectId values do not leak unexpectedly into DTOs.
+- Repository read paths should return schema class instances with normalized ObjectId/string values, including populated and deep-populated values.
+- Code that needs raw Mongoose documents should use `MongoService.getModel(...)` or Typegoose/Mongoose APIs directly.
 
 ## Query Safety
 
