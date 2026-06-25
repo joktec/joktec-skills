@@ -1013,6 +1013,7 @@ Best practice:
 - Use the package service for outbound HTTP so retry/proxy/metrics behavior stays centralized.
 - Keep external endpoint URLs and credentials in runtime config.
 - Be careful with ESM/CommonJS import changes in HTTP/Axios ecosystem packages.
+- `HttpService.buildAgent(proxy, opts)` expects proxy identity in `HttpProxyConfig` and agent tuning in Node `AgentOptions`; inspect the installed source before adapting to proxy-agent major-version changes.
 - Test request behavior with mocks unless the test is an explicit consumer integration scenario.
 
 ## File
