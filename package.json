@@ -50,7 +50,7 @@
   "scripts": {
     "sync:version": "node scripts/sync-pack-version.mjs",
     "check:version": "node scripts/sync-pack-version.mjs --check",
-    "version": "pnpm run sync:version",
+    "version": "node scripts/sync-pack-version.mjs --stage",
     "check": "pnpm run check:version && node scripts/validate-skills.mjs && node scripts/sync-from-joktec-framework.mjs --check",
     "validate": "node scripts/validate-skills.mjs",
     "build": "node scripts/build-skill-folders.mjs && node scripts/build-cursor-rules.mjs && node scripts/build-gemini-md.mjs && node scripts/build-copilot-instructions.mjs && node scripts/build-windsurf-rules.mjs",
@@ -63,7 +63,7 @@
     "prepack": "pnpm run build && pnpm run check",
     "pack:check": "pnpm pack --dry-run",
     "prepublish:check": "pnpm run build && pnpm run check && pnpm pack --dry-run",
-    "publish:dry-run": "pnpm run prepublish:check && pnpm publish --dry-run --no-git-checks --access public",
+    "publish:dry-run": "pnpm run prepublish:check && pnpm publish --dry-run --access public",
     "publish:registry": "pnpm run prepublish:check && pnpm publish --access public",
     "release:patch": "pnpm version patch && pnpm run publish:registry",
     "release:minor": "pnpm version minor && pnpm run publish:registry",
