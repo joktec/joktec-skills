@@ -1,6 +1,6 @@
 {
   "name": "@joktec/skills",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "sourceOfTruth": "../joktec-framework",
   "frameworkBaseline": {
     "repo": "https://github.com/joktec/joktec-framework",
