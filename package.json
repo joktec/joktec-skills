@@ -1,6 +1,6 @@
 {
   "name": "@joktec/skills",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": false,
   "description": "Hybrid agent skill pack for using @joktec/* libraries in consumer projects.",
   "license": "MIT",
