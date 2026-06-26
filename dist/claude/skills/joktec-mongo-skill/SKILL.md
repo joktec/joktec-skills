@@ -17,6 +17,8 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Keep schema classes, app repositories, and app-specific queries in the consumer app.
 - Extend `MongoRepo<T, ID>` for app repositories.
 - Preserve `conId` when the app has multiple Mongo connections.
+- For Mongo config, treat `params` as final query-style overrides after `options`; duplicate keys in `params` win over `options`.
+- Enable `autoIndex` only in one schema/index owner process for a shared database; request-facing clusters should keep it disabled.
 - Use schema-first decorators when a schema class should be reused as a DTO source; wrappers should reduce repeated Typegoose, validator, transformer, and Swagger stacks.
 - Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.

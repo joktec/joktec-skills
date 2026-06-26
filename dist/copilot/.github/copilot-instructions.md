@@ -261,6 +261,8 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Keep schema classes, app repositories, and app-specific queries in the consumer app.
 - Extend `MongoRepo<T, ID>` for app repositories.
 - Preserve `conId` when the app has multiple Mongo connections.
+- For Mongo config, treat `params` as final query-style overrides after `options`; duplicate keys in `params` win over `options`.
+- Enable `autoIndex` only in one schema/index owner process for a shared database; request-facing clusters should keep it disabled.
 - Use schema-first decorators when a schema class should be reused as a DTO source; wrappers should reduce repeated Typegoose, validator, transformer, and Swagger stacks.
 - Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
@@ -311,6 +313,29 @@ Best practice:
 - Use one owner process for index creation in multi-process deployments.
 - Preserve `conId` through service/repo constructors for multi-connection apps.
 - Do not rely on the global mongoose model registry when `MongoService` provides connection-aware resolution.
+
+## Connection Config
+
+`@joktec/mongo` merges connection values in this order:
+
+1. framework defaults
+2. `mongo.options`
+3. query-style `mongo.params`
+
+When `params` and `options` contain the same MongoDB driver option, `params` wins.
+
+```yaml
+mongo:
+  params: authSource=app_db&replicaSet=rs0&directConnection=true&connectTimeoutMS=20000
+  options:
+    authSource: admin
+    connectTimeoutMS: 30000
+    serverSelectionTimeoutMS: 5000
+```
+
+The final config uses `authSource=app_db` and `connectTimeoutMS=20000`, while preserving `serverSelectionTimeoutMS=5000`.
+
+`autoIndex` should be enabled only in a single schema/index owner process. The package checks index drift with `diffIndexes()` and runs `syncIndexes({ continueOnError: true })` when needed. Sync errors are logged with connection/schema context. Request-facing clusters should keep `autoIndex` disabled.
 
 ## Repository Pattern
 
