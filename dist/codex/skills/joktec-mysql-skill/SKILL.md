@@ -20,6 +20,7 @@ Use this skill for relational resources backed by JokTec's TypeORM wrapper.
 - Keep `sync` explicit and normally enabled only by an owner process or development bootstrap.
 - Do not add new behavior to deprecated `MysqlFinder`; use `MysqlRepo.qb()` and `MysqlHelper` paths.
 - Use schema-first `@Column`, `@PrimaryColumn`, and `@TimestampColumn` wrappers when an entity also acts as DTO metadata.
+- Use `@Column({ enum: SomeEnum })` for enum columns; the wrapper infers enum column type, validation, and Swagger enum metadata unless `type` is explicitly overridden.
 - Use `@Column({ kind: 'virtual' })` for computed getters that need expose/Swagger metadata without persistence.
 - Use `immutable` for API read-only metadata; TypeORM `update: false` remains storage write behavior and is also inferred as Swagger read-only when `immutable` is not set.
 - Do not add `swagger.type` just because a column has a primitive, date, array, nested JSON class, or relation type. The wrapper infers Swagger metadata from TypeScript design type and JokTec options. Use `swagger` only to override an inferred shape.

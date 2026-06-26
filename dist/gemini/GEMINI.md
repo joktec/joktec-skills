@@ -168,14 +168,14 @@ Use BaseController/BaseService when the resource follows standard CRUD. Avoid th
 Controller checklist:
 
 - choose the DTO/entity class intentionally
-- set `paginationMode` for the representative Swagger response shape
+- set `paginate.mode` for the representative Swagger response shape
 - use `customDto.paginationDto` only when the built-in page/offset/cursor response does not represent the API
 - keep auth/guards/interceptors consistent with app conventions
 - avoid putting business branching in controller methods when it belongs in the service
 
 ## Pagination
 
-Request priority is cursor, then offset, then page. `BaseController.paginationMode` affects Swagger response shape; runtime selection remains request-driven unless the app service narrows it.
+Request priority is cursor, then offset, then page. `BaseController` reads `paginate.mode` for Swagger response shape; runtime selection remains request-driven unless the app service narrows it.
 
 Best practice:
 
@@ -271,6 +271,7 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
 - Use `@Schema({ kind: 'subdocument' })` for embedded documents that need their own `_id` and timestamps.
+- Use `@Prop({ enum: SomeEnum })` for enum fields; the wrapper infers string or number storage type, validation, and Swagger enum metadata unless `type` is explicitly provided.
 - Use `@Prop({ kind: 'virtual', mode: 'getter' })` for computed getters that need expose/Swagger metadata without persistence.
 - Use `@Prop({ ref: () => Target, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
 - Use `@Prop({ type: () => [Target], ref: () => Target, foreignField, localField })` for populate-array virtuals.
@@ -394,6 +395,7 @@ Best practice:
 - Use lazy `type` resolvers such as `type: () => User` or `type: () => [User]` when the wrapper cannot infer the runtime class.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
 - Use `@Schema({ kind: 'subdocument' })` for embedded documents that need `_id` and timestamps but should not create a collection.
+- Use `@Prop({ enum: SomeEnum })` for enum fields; the wrapper infers string or number storage type, validation, and Swagger enum metadata unless `type` is explicitly provided.
 - Use `@Prop({ kind: 'virtual', mode: 'getter', comment, optional, hidden, expose, swagger })` for computed getters that only need class-transformer and Swagger metadata.
 - Use `@Prop({ ref: () => User, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
 - Use `@Prop({ type: () => [User], ref: () => User, foreignField, localField })` for populate-array virtuals.
@@ -456,6 +458,7 @@ Use this skill for relational resources backed by JokTec's TypeORM wrapper.
 - Keep `sync` explicit and normally enabled only by an owner process or development bootstrap.
 - Do not add new behavior to deprecated `MysqlFinder`; use `MysqlRepo.qb()` and `MysqlHelper` paths.
 - Use schema-first `@Column`, `@PrimaryColumn`, and `@TimestampColumn` wrappers when an entity also acts as DTO metadata.
+- Use `@Column({ enum: SomeEnum })` for enum columns; the wrapper infers enum column type, validation, and Swagger enum metadata unless `type` is explicitly overridden.
 - Use `@Column({ kind: 'virtual' })` for computed getters that need expose/Swagger metadata without persistence.
 - Use `immutable` for API read-only metadata; TypeORM `update: false` remains storage write behavior and is also inferred as Swagger read-only when `immutable` is not set.
 - Do not add `swagger.type` just because a column has a primitive, date, array, nested JSON class, or relation type. The wrapper infers Swagger metadata from TypeScript design type and JokTec options. Use `swagger` only to override an inferred shape.
@@ -521,6 +524,7 @@ Wrapper philosophy:
 - prefer one schema declaration that carries persistence, validation, transform, and Swagger metadata
 - use wrapper options before duplicating `@ApiProperty`, `@Expose`, `@Type`, or common validators
 - do not add `swagger.type` for normal scalar/date fields, arrays, nested JSON classes, or relations when the wrapper can infer the shape
+- use `@Column({ enum: SomeEnum })` for enum columns; the wrapper infers enum column type, validation, and Swagger enum metadata unless `type` is explicitly overridden
 - use raw TypeORM only for advanced cases that the wrapper does not model cleanly
 - keep storage write behavior and API documentation behavior distinct when needed
 

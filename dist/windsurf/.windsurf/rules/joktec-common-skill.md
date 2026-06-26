@@ -68,14 +68,14 @@ Use BaseController/BaseService when the resource follows standard CRUD. Avoid th
 Controller checklist:
 
 - choose the DTO/entity class intentionally
-- set `paginationMode` for the representative Swagger response shape
+- set `paginate.mode` for the representative Swagger response shape
 - use `customDto.paginationDto` only when the built-in page/offset/cursor response does not represent the API
 - keep auth/guards/interceptors consistent with app conventions
 - avoid putting business branching in controller methods when it belongs in the service
 
 ## Pagination
 
-Request priority is cursor, then offset, then page. `BaseController.paginationMode` affects Swagger response shape; runtime selection remains request-driven unless the app service narrows it.
+Request priority is cursor, then offset, then page. `BaseController` reads `paginate.mode` for Swagger response shape; runtime selection remains request-driven unless the app service narrows it.
 
 Best practice:
 

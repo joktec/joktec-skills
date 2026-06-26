@@ -48,6 +48,7 @@ Wrapper philosophy:
 - prefer one schema declaration that carries persistence, validation, transform, and Swagger metadata
 - use wrapper options before duplicating `@ApiProperty`, `@Expose`, `@Type`, or common validators
 - do not add `swagger.type` for normal scalar/date fields, arrays, nested JSON classes, or relations when the wrapper can infer the shape
+- use `@Column({ enum: SomeEnum })` for enum columns; the wrapper infers enum column type, validation, and Swagger enum metadata unless `type` is explicitly overridden
 - use raw TypeORM only for advanced cases that the wrapper does not model cleanly
 - keep storage write behavior and API documentation behavior distinct when needed
 

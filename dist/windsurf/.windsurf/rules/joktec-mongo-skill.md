@@ -14,6 +14,7 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
 - Use `@Schema({ kind: 'subdocument' })` for embedded documents that need their own `_id` and timestamps.
+- Use `@Prop({ enum: SomeEnum })` for enum fields; the wrapper infers string or number storage type, validation, and Swagger enum metadata unless `type` is explicitly provided.
 - Use `@Prop({ kind: 'virtual', mode: 'getter' })` for computed getters that need expose/Swagger metadata without persistence.
 - Use `@Prop({ ref: () => Target, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
 - Use `@Prop({ type: () => [Target], ref: () => Target, foreignField, localField })` for populate-array virtuals.
@@ -137,6 +138,7 @@ Best practice:
 - Use lazy `type` resolvers such as `type: () => User` or `type: () => [User]` when the wrapper cannot infer the runtime class.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
 - Use `@Schema({ kind: 'subdocument' })` for embedded documents that need `_id` and timestamps but should not create a collection.
+- Use `@Prop({ enum: SomeEnum })` for enum fields; the wrapper infers string or number storage type, validation, and Swagger enum metadata unless `type` is explicitly provided.
 - Use `@Prop({ kind: 'virtual', mode: 'getter', comment, optional, hidden, expose, swagger })` for computed getters that only need class-transformer and Swagger metadata.
 - Use `@Prop({ ref: () => User, foreignField, localField })` for populate-one virtuals when inferred defaults are enough.
 - Use `@Prop({ type: () => [User], ref: () => User, foreignField, localField })` for populate-array virtuals.
