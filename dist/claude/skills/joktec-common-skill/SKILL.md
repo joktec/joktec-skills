@@ -1,6 +1,6 @@
 ---
 name: joktec-common-skill
-description: Use when implementing or wiring @joktec/core, @joktec/utils, or @joktec/cron in a consumer app, especially BaseController, BaseService, pagination, config, client lifecycle, bootstrap, cron decorators, or utility helpers.
+description: Use when implementing or wiring @joktec/core, @joktec/utils, or @joktec/cron in a consumer app, especially BaseController, SubController, BaseService, ClientController, SubClientController, pagination, config, client lifecycle, bootstrap, cron decorators, or utility helpers.
 metadata:
   dependencies:
     - joktec-framework-skill
@@ -20,11 +20,13 @@ Use this skill for shared framework primitives, low-level helpers, cron utilitie
 ## Rules
 
 - Keep `@joktec/core` app-neutral; do not import adapters, brokers, databases, integrations, or consumer app code into core concepts.
-- Use `BaseController` and `BaseService` for standard CRUD flows before hand-writing repetitive controllers.
+- Use `BaseController` and `BaseService` for standard top-level CRUD flows before hand-writing repetitive controllers.
+- Use `SubController` and `IBaseSubService` for parent-child HTTP resources such as `/articles/:articleId/comments`.
+- Use `ClientController`/`ClientService` and `SubClientController`/`SubClientService` for private transport CRUD; nested commands use `Parent.Child.action`.
 - Use page, offset, or cursor pagination contracts from core; let database packages execute storage-specific pagination.
 - Use `AbstractClientService` patterns for client packages that need config, lifecycle, retry, and `conId`.
 - Use `@joktec/utils` for shared helpers instead of duplicating conversion, validation, hashing, or UUID logic.
-- If guidance is insufficient, read this skill's references and inspect `../joktec-framework` package source or GitHub fallback before assuming APIs.
+- In consumer projects, inspect `node_modules/@joktec/core` first when available. If package source is unavailable or insufficient, read package README/GitHub docs, then GitHub source before assuming APIs.
 
 ## References
 
