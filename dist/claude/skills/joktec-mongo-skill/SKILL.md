@@ -1,6 +1,6 @@
 ---
 name: joktec-mongo-skill
-description: Use when working with @joktec/mongo in a consumer app, including MongoModule setup, Typegoose schema decorators, MongoRepo, MongoService, MongoHelper, plugins, ObjectId/query safety, soft delete, strict references, and cursor pagination.
+description: Use when working with @joktec/mongo in a consumer app, including MongoModule setup, Typegoose schema decorators, MongoRepo, MongoService, MongoHelper, plugins, ObjectId/query safety, soft delete, strict references, cursor pagination, coverage checks, and Change Streams.
 metadata:
   dependencies:
     - joktec-framework-skill
@@ -19,6 +19,8 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 - Preserve `conId` when the app has multiple Mongo connections.
 - For Mongo config, treat `params` as final query-style overrides after `options`; duplicate keys in `params` win over `options`.
 - Enable `autoIndex` only in one schema/index owner process for a shared database; request-facing clusters should keep it disabled.
+- Use `MongoService.getCoverage(...)` before depending on sessions, transactions, or Change Streams. Standalone MongoDB cannot use Change Streams.
+- Use `MongoRepo.watch(...)` or `MongoService.watch(...)` for realtime MongoDB Change Streams. Do not confuse this with `MongoRepo.cursor(...)`, which only iterates query results.
 - Use schema-first decorators when a schema class should be reused as a DTO source; wrappers should reduce repeated Typegoose, validator, transformer, and Swagger stacks.
 - Use `RefId<T>` for stored reference id fields and `PopulatedRef<T>` for populated virtual fields.
 - Use `@Schema({ kind: 'embedded' })` for value objects without `_id` or timestamps.
@@ -33,5 +35,5 @@ Use this skill for MongoDB-backed resources that rely on JokTec's Mongoose/Typeg
 
 ## References
 
-- Read `references/repository.md` for `MongoService`, `MongoRepo`, query parsing, and cursor pagination.
+- Read `references/repository.md` for `MongoService`, `MongoRepo`, query parsing, cursor pagination, coverage checks, and Change Streams.
 - Read `references/schema-and-plugins.md` for decorators, paranoid soft delete, strict references, transform behavior, and debug output.
